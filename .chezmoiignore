@@ -1,0 +1,34 @@
+# Targets chezmoi must never deploy. This file is a template: entries below
+# gate whole modules on the machine flags answered at `chezmoi init`.
+# Directory ignores need both the dir and dir/** (patterns match target paths).
+
+# repo meta — never deployed to $HOME
+README.md
+LICENSE
+docs
+docs/**
+test
+test/**
+scripts
+scripts/**
+
+{{ if or (not .gui) (ne .chezmoi.os "linux") }}
+# linux GUI module
+.config/sway
+.config/sway/**
+.config/swaync
+.config/swaync/**
+.config/waybar
+.config/waybar/**
+{{ end }}
+
+{{ if not .gui }}
+# cross-platform GUI
+.config/alacritty
+.config/alacritty/**
+{{ end }}
+
+{{ if or (not .gui) (ne .chezmoi.os "darwin") }}
+# mac GUI module
+.aerospace.toml
+{{ end }}

@@ -1,0 +1,21 @@
+{{ if and .work .overlay -}}
+#!/bin/bash
+# SPDX-License-Identifier: MIT
+# Work overlay bootstrap. Runs once per machine, only when init was answered
+# with work=true and a non-empty overlay repo URL. The overlay repo (private)
+# owns all work-specific config; this repo stays employer-agnostic. Renders
+# empty (= skipped) otherwise.
+set -euo pipefail
+
+DEST="$HOME/.work-dotfiles"
+
+if [ ! -d "$DEST/.git" ]; then
+  git clone {{ .overlay | quote }} "$DEST"
+fi
+
+if [ -x "$DEST/install.sh" ]; then
+  "$DEST/install.sh"
+else
+  echo "overlay cloned to $DEST but no executable install.sh found" >&2
+fi
+{{ end -}}

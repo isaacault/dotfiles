@@ -1,0 +1,42 @@
+name: ci
+on:
+  push:
+  pull_request:
+
+jobs:
+  fresh-apply:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        flags:
+          - "work=false,gui=true,provision=false"
+          - "work=true,gui=false,provision=false"
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install chezmoi
+        run: sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin"
+      - name: Fresh apply
+        # work-machine values are placeholders: the real ones are typed once at
+        # init and only ever live in the machine-local (untracked) config
+        run: |
+          "$HOME/.local/bin/chezmoi" init --apply --source "$GITHUB_WORKSPACE" \
+            --promptBool "${{ matrix.flags }}" \
+            --promptString "email=ci@example.com,overlay="
+      - name: Verify applied state matches source
+        run: "$HOME/.local/bin/chezmoi" verify --source "$GITHUB_WORKSPACE"
+      - name: Assert no secrets deployed
+        # grep every file chezmoi deployed (chezmoi managed), not a hand-picked
+        # subset, for known token prefixes; externals are third-party plugin
+        # repos and excluded
+        run: |
+          cd "$HOME"
+          managed=$("$HOME/.local/bin/chezmoi" managed --include=files --exclude=externals --source "$GITHUB_WORKSPACE")
+          ! echo "$managed" | xargs grep -lE "(nvapi-|glpat-|ghp_)" 2>/dev/null | grep -q .
+
+  shellcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: shellcheck test/docker-test.sh test/local-test.sh scripts/migrate-xdg.sh

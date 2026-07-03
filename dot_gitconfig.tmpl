@@ -1,0 +1,16 @@
+[user]
+	name = Isaac Ault
+	email = {{ .email }}
+
+# Personal GitHub repos always commit under the personal identity, even on
+# work machines — covers this dotfiles repo and every isaacault/* clone.
+# (git >= 2.36; older gits ignore the condition harmlessly.)
+[includeIf "hasconfig:remote.*.url:git@github.com:isaacault/**"]
+	path = ~/.config/git/personal
+[includeIf "hasconfig:remote.*.url:https://github.com/isaacault/**"]
+	path = ~/.config/git/personal
+
+# Machine-local git config (credential helpers, work host overrides).
+# ~/.gitconfig.local is untracked and never enters the dotfiles repo.
+[include]
+	path = ~/.gitconfig.local

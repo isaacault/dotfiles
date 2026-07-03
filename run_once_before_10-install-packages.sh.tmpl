@@ -1,0 +1,39 @@
+{{ if .provision -}}
+#!/bin/bash
+# SPDX-License-Identifier: MIT
+# Core tool install. Runs once per machine (chezmoi run_once_before_), and only
+# on machines initialized with provision=true. Renders empty (= skipped)
+# otherwise.
+set -euo pipefail
+
+{{ if eq .chezmoi.os "darwin" -}}
+command -v brew >/dev/null 2>&1 || { echo "Homebrew required first: https://brew.sh" >&2; exit 1; }
+brew install {{ .packages.brew | join " " }}
+{{ else -}}
+SUDO=""
+[ "$(id -u)" -ne 0 ] && SUDO="sudo"
+
+if command -v apt-get >/dev/null 2>&1; then
+  $SUDO apt-get update -qq
+  $SUDO apt-get install -y -qq {{ .packages.apt | join " " }}
+elif command -v dnf >/dev/null 2>&1; then
+  $SUDO dnf install -y -q {{ .packages.dnf | join " " }}
+else
+  echo "No supported package manager (apt/dnf) — install manually: {{ .packages.apt | join " " }}" >&2
+fi
+
+# neovim: distro repos lag badly; use the official release tarball
+if ! command -v nvim >/dev/null 2>&1 && [ ! -d "$HOME/.local/opt/nvim-linux-x86_64" ]; then
+  mkdir -p "$HOME/.local/opt" "$HOME/.local/bin"
+  curl -fsSL https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz \
+    | tar xz -C "$HOME/.local/opt"
+  ln -sf "$HOME/.local/opt/nvim-linux-x86_64/bin/nvim" "$HOME/.local/bin/nvim"
+fi
+
+# starship prompt (bash uses it; zsh uses pure)
+if ! command -v starship >/dev/null 2>&1; then
+  mkdir -p "$HOME/.local/bin"
+  curl -fsSL https://starship.rs/install.sh | sh -s -- -y -b "$HOME/.local/bin"
+fi
+{{ end -}}
+{{ end -}}

@@ -1,0 +1,40 @@
+# External repos pulled on apply — replaces the git submodules the old
+# isaacault/tmux and isaacault/zsh repos used. Refreshed weekly at most.
+
+# tmux plugins (TPM expects them under ~/.config/tmux/plugins/;
+# catppuccin/tmux deliberately lands as "tmux" — that's the name TPM uses)
+[".config/tmux/plugins/tpm"]
+    type = "git-repo"
+    url = "https://github.com/tmux-plugins/tpm.git"
+    refreshPeriod = "168h"
+
+[".config/tmux/plugins/tmux"]
+    type = "git-repo"
+    url = "https://github.com/catppuccin/tmux.git"
+    refreshPeriod = "168h"
+
+[".config/tmux/plugins/tmux-resurrect"]
+    type = "git-repo"
+    url = "https://github.com/tmux-plugins/tmux-resurrect.git"
+    refreshPeriod = "168h"
+
+[".config/tmux/plugins/tmux-continuum"]
+    type = "git-repo"
+    url = "https://github.com/tmux-plugins/tmux-continuum.git"
+    refreshPeriod = "168h"
+
+# zsh plugins (ZDOTDIR = ~/.config/zsh)
+[".config/zsh/plugins/zsh-completions"]
+    type = "git-repo"
+    url = "https://github.com/zsh-users/zsh-completions.git"
+    refreshPeriod = "168h"
+
+[".config/zsh/plugins/zsh-syntax-highlighting"]
+    type = "git-repo"
+    url = "https://github.com/zsh-users/zsh-syntax-highlighting.git"
+    refreshPeriod = "168h"
+
+[".config/zsh/plugins/pure"]
+    type = "git-repo"
+    url = "https://github.com/sindresorhus/pure.git"
+    refreshPeriod = "168h"

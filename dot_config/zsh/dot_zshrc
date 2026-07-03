@@ -1,0 +1,44 @@
+# Zsh Options
+setopt HIST_SAVE_NO_DUPS         # Do not write a duplicate event to the history file.
+
+setopt AUTO_PUSHD           # Push the current directory visited on the stack.
+setopt PUSHD_IGNORE_DUPS    # Do not store duplicates in the stack.
+setopt PUSHD_SILENT         # Do not print the directory stack after pushd or popd.
+
+
+# Aliases
+alias vimdiff='nvim -d'
+alias vim='nvim'
+alias vi='nvim'
+
+# Initialise completion
+source $ZDOTDIR/completion.zsh
+
+# Vim mode
+bindkey -v
+export KEYTIMEOUT=1
+
+# esc-v to edit command in text editor (vim)
+autoload -Uz edit-command-line
+zle -N edit-command-line
+bindkey -M vicmd v edit-command-line
+
+# Add brew to path. See `brew help shellenv` for details.
+if [[ $OSTYPE == darwin* ]]; then
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+fi
+
+# Set up fzf key bindings and fuzzy completion
+source <(fzf --zsh)
+
+# Syntax Highlighting
+source $ZDOTDIR/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
+# Pure Prompt: https://github.com/sindresorhus/pure
+fpath+=($ZDOTDIR/plugins/pure)
+autoload -U promptinit; promptinit
+prompt pure
+
+# Machine-local: secrets, tokens, machine-specific config.
+# $ZDOTDIR/.zshrc.local is untracked and must NEVER move into the dotfiles repo.
+[[ -f "$ZDOTDIR/.zshrc.local" ]] && source "$ZDOTDIR/.zshrc.local"

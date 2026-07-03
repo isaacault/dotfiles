@@ -1,0 +1,7 @@
+# Package lists consumed by run_once_before_10-install-packages.sh.tmpl
+# (only when the machine was initialized with provision=true).
+
+[packages]
+apt = ["git", "curl", "tmux", "zsh", "fzf", "ripgrep", "fd-find", "xclip", "build-essential"]
+dnf = ["git", "curl", "tmux", "zsh", "fzf", "ripgrep", "fd-find", "xclip", "gcc", "gcc-c++", "make"]
+brew = ["git", "tmux", "zsh", "fzf", "ripgrep", "fd", "neovim", "starship"]
