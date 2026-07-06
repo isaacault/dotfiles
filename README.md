@@ -10,7 +10,7 @@ Single source of truth for all machine configuration, managed with
 sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply isaacault
 ```
 
-One command: installs chezmoi to `~/bin`, clones this repo, asks three
+One command: installs chezmoi to `~/bin`, clones this repo, asks a few
 questions (work machines get two more), applies everything.
 
 | Prompt | Effect |
@@ -18,6 +18,7 @@ questions (work machines get two more), applies everything.
 | `work` | prompts for work git `email` + an optional private `overlay` repo URL; otherwise personal email |
 | `gui` | deploys sway/swaync/waybar (linux), aerospace (mac), alacritty |
 | `provision` | installs packages on first apply (apt/dnf/brew; nvim + starship via official releases) |
+| `kb` | optional personal knowledge-base repo URL; when set, cloned to `~/kb` on first apply (empty = skipped) |
 
 Answers are stored per-machine in `~/.config/chezmoi/chezmoi.toml` (untracked).
 To change an answer later: edit that file, then `chezmoi apply`.
@@ -28,9 +29,11 @@ To change an answer later: edit that file, then `chezmoi apply`.
 - **tmux** — `~/.config/tmux/tmux.conf`; plugins pulled as chezmoi externals (tpm, catppuccin, resurrect, continuum)
 - **nvim** — full lazy.nvim config, `lazy-lock.json` pins plugins
 - **git** — identity templated by machine kind; `~/.gitconfig.local` for machine-local extras
+- **Claude Code** — curated subset of `~/.claude`: `CLAUDE.md` (global instructions), `settings.json`, `keybindings.json` — config only, never state/credentials or work-internal skills
 - **GUI (optional)** — sway, swaync, waybar, alacritty, aerospace
 - **work (optional)** — a private overlay repo owns all work-specific config;
   see below
+- **knowledge base (optional)** — the `kb` repo URL, cloned to `~/kb` on first apply
 
 ## Git identity
 
@@ -48,6 +51,13 @@ A `run_once` clones it to `~/.work-dotfiles` and runs its `install.sh`, which
 hooks into the same untracked `.local` files this repo already sources.
 Everything work-specific — tools, hosts, extra shell/git config — lives in
 the overlay; this repo never references any of it.
+
+The overlay and `kb` clones use SSH, so **this machine's SSH key must be
+registered with the git host before first apply.** New host keys are accepted
+automatically (`StrictHostKeyChecking=accept-new`), including non-standard
+ports from the URL — no manual `known_hosts` step. If the clone fails (usually
+an unregistered key), the `run_once` prints the fix and exits non-zero so it
+retries on the next `chezmoi apply` once access is sorted.
 
 ## Migrating an old machine
 

@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(/{{ .chezmoi.homeDir }}/kb/**)"
+    ],
+    "defaultMode": "default",
+    "additionalDirectories": [
+      "{{ .chezmoi.homeDir }}/kb"
+    ]
+  },
+  "model": "claude-fable-5[1m]",
+  "effortLevel": "high",
+  "skipWorkflowUsageWarning": true,
+  "editorMode": "normal",
+  "preferredNotifChannel": "auto"
+}
