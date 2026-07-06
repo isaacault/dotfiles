@@ -23,7 +23,7 @@ jobs:
         run: |
           "$HOME/.local/bin/chezmoi" init --apply --source "$GITHUB_WORKSPACE" \
             --promptBool "${{ matrix.flags }}" \
-            --promptString "email=ci@example.com,overlay="
+            --promptString "email=ci@example.com,overlay=,kb="
       - name: Verify applied state matches source
         run: |
           "$HOME/.local/bin/chezmoi" verify --source "$GITHUB_WORKSPACE"
