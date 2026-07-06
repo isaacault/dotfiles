@@ -55,6 +55,7 @@ echo "case 1 (personal+gui) OK"
 # throwaway fixture repo proving the clone-and-install mechanism end to end.
 OVR="$(mktemp -d)"
 git -C "$OVR" init -q
+# shellcheck disable=SC2016  # $HOME must stay literal — it expands when the generated install.sh runs
 printf '#!/bin/sh\ntouch "$HOME/.overlay-ran"\n' > "$OVR/install.sh"
 chmod +x "$OVR/install.sh"
 git -C "$OVR" add -A
