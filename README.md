@@ -17,7 +17,7 @@ questions (work machines get two more), applies everything.
 |---|---|
 | `work` | prompts for work git `email` + an optional private `overlay` repo URL; otherwise personal email |
 | `gui` | deploys sway/swaync/waybar (linux), aerospace (mac), alacritty |
-| `provision` | installs packages on first apply (apt/dnf/brew; nvim + starship via official releases) |
+| `provision` | installs packages on first apply (apt/dnf/brew; nvim, starship + Claude Code CLI via official installers) |
 | `kb` | optional personal knowledge-base repo URL; when set, cloned to `~/kb` on first apply (empty = skipped) |
 
 Answers are stored per-machine in `~/.config/chezmoi/chezmoi.toml` (untracked).
