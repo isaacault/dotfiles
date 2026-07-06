@@ -60,12 +60,40 @@ Decisions made 2026-07-03, consolidating configs previously spread over
 - nvim's `node_modules`/`package*.json` (runtime artifacts) and the old
   per-repo `setup.sh` scripts were not folded in.
 
-## Phase 2 (planned, not yet done)
+## SSH clones on fresh boxes
+
+The `overlay` and `kb` repos are cloned over SSH by `run_once` scripts, often
+from hosts on non-standard ports whose keys aren't in `known_hosts` yet — an
+unattended clone would otherwise hang on host-key verification. Both scripts
+set `GIT_SSH_COMMAND='ssh -o StrictHostKeyChecking=accept-new -o
+ConnectTimeout=10'`: the port comes from the URL (no `ssh-keyscan`/`known_hosts`
+step), new host keys are accepted on first contact and pinned thereafter, and a
+dead host fails fast. On clone failure — almost always an SSH key not yet
+registered with the host — the script prints the fix and exits non-zero *on
+purpose*: chezmoi records `run_once` scripts as done only on success, so this
+retries on the next `chezmoi apply` once access is sorted, rather than recording
+false success. The one prerequisite chezmoi can't handle is the key itself: it
+must be registered with the git host before first apply.
+
+## Phase 2
+
+Done:
+
+- **AI tooling**: curated subset of `~/.claude/` — `CLAUDE.md` (global
+  instructions, work-import block gated on `work`), `settings.json` (home paths
+  templated via `.chezmoi.homeDir`), `keybindings.json`. Config only, never
+  state/credentials (`~/.claude.json`, sessions, history, etc. stay out), and
+  never the work-internal, externally-managed `skills/`. `commands/`/`agents/`
+  are empty so nothing to fold in yet.
+- **KB provisioning**: `run_once_after_80-provision-kb.sh.tmpl` clones the
+  knowledge-base repo to `~/kb` when an optional `kb` URL was given at init.
+  The URL is per-machine data (never committed), mirroring `overlay`; the gate
+  uses `dig` so machines whose stored config predates the `kb` key skip cleanly
+  until re-init instead of erroring. `kb import` of a snapshot stays a hint, not
+  an automatic step (run_once is non-interactive; the committed `vault/` is
+  already present on clone).
+
+Still planned:
 
 - **aerospace**: `chezmoi add ~/.aerospace.toml` from the Mac (ignore rule
   already gates it to darwin+gui).
-- **AI tooling**: curated subset of `~/.claude/` (CLAUDE.md, settings.json,
-  commands/, agents/) — config only, never state/credentials
-  (`~/.claude.json` stays out).
-- **KB provisioning**: a `run_once` script to clone the knowledge-base repo
-  and prompt for `kb import` of the latest snapshot on new machines.

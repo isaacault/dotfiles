@@ -18,10 +18,11 @@ cz() {
       XDG_DATA_HOME="$home/.local/share" "$CZ" "$@"
 }
 
-# --- case 1: personal + gui ---
+# --- case 1: personal + gui (kb unset) ---
 H1="$(mktemp -d)"
 cz "$H1" init --apply --source "$SRC" \
-  --promptBool work=false,gui=true,provision=false
+  --promptBool work=false,gui=true,provision=false \
+  --promptString kb=
 
 [ -f "$H1/.bashrc" ]                          || fail "bashrc missing"
 [ -f "$H1/.zshenv" ]                          || fail "zshenv missing"
@@ -37,6 +38,12 @@ grep -q isaac.ault@gmail.com "$H1/.gitconfig" || fail "personal email not set"
 [ ! -e "$H1/.work-dotfiles" ]                 || fail "work overlay ran (work=false)"
 [ ! -e "$H1/README.md" ]                      || fail "README leaked"
 [ ! -e "$H1/docs" ]                           || fail "docs leaked"
+# ~/.claude curated subset deploys everywhere; work block gated off on personal
+[ -f "$H1/.claude/CLAUDE.md" ]                || fail "claude CLAUDE.md missing"
+[ -f "$H1/.claude/keybindings.json" ]         || fail "claude keybindings missing"
+grep -q "$H1/kb" "$H1/.claude/settings.json"  || fail "claude settings homeDir not templated"
+! grep -q "Work context" "$H1/.claude/CLAUDE.md" || fail "work block leaked (work=false)"
+[ ! -e "$H1/kb" ]                             || fail "kb cloned (kb unset)"
 ! grep -qrE '(nvapi-|glpat-|ghp_)' "$H1/.bashrc" "$H1/.gitconfig" "$H1/.config/zsh" \
                                               || fail "secret pattern in applied home"
 rm -rf "$H1"
@@ -54,10 +61,19 @@ git -C "$OVR" add -A
 git -C "$OVR" -c user.name=fixture -c user.email=fixture@example.com \
   commit -qm "overlay fixture"
 
+# kb is provisioned by the same clone-on-first-apply mechanism; a throwaway
+# fixture repo proves the run_once clones ~/kb end to end.
+KBR="$(mktemp -d)"
+git -C "$KBR" init -q
+printf 'kb fixture\n' > "$KBR/README.md"
+git -C "$KBR" add -A
+git -C "$KBR" -c user.name=fixture -c user.email=fixture@example.com \
+  commit -qm "kb fixture"
+
 H2="$(mktemp -d)"
 cz "$H2" init --apply --source "$SRC" \
   --promptBool work=true,gui=false,provision=false \
-  --promptString "email=work@example.com,overlay=file://$OVR"
+  --promptString "email=work@example.com,overlay=file://$OVR,kb=file://$KBR"
 
 grep -q work@example.com "$H2/.gitconfig"     || fail "work email not set"
 [ -f "$H2/.config/git/personal" ]             || fail "personal git include missing"
@@ -66,7 +82,9 @@ grep -q '\.local/share' "$H2/.zshenv"         || fail "XDG_DATA_HOME not standar
 [ -f "$H2/.overlay-ran" ]                     || fail "overlay install.sh did not run"
 [ ! -e "$H2/.config/sway" ]                   || fail "sway leaked (gui=false)"
 [ ! -e "$H2/.config/alacritty" ]              || fail "alacritty leaked (gui=false)"
-rm -rf "$H2" "$OVR"
+[ -d "$H2/kb/.git" ]                          || fail "kb not cloned (kb set)"
+grep -q "Work context" "$H2/.claude/CLAUDE.md" || fail "work block missing (work=true)"
+rm -rf "$H2" "$OVR" "$KBR"
 echo "case 2 (work+nogui) OK"
 
 echo "LOCAL SMOKE TEST OK"

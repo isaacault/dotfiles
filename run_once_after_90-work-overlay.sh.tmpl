@@ -5,12 +5,31 @@
 # with work=true and a non-empty overlay repo URL. The overlay repo (private)
 # owns all work-specific config; this repo stays employer-agnostic. Renders
 # empty (= skipped) otherwise.
+#
+# Fresh headless boxes: the overlay is an SSH URL (often a non-standard port),
+# whose host key isn't in known_hosts yet, so an unattended clone would hang on
+# host-key verification. We accept new host keys automatically (the port comes
+# from the URL, so no manual known_hosts step) and fail fast with an actionable
+# message. On failure we exit non-zero on purpose: chezmoi records run_once
+# scripts as done only on success, so this retries on the next `chezmoi apply`
+# once the user has registered their SSH key with the host.
 set -euo pipefail
 
 DEST="$HOME/.work-dotfiles"
 
 if [ ! -d "$DEST/.git" ]; then
-  git clone {{ .overlay | quote }} "$DEST"
+  if ! GIT_SSH_COMMAND='ssh -o StrictHostKeyChecking=accept-new -o ConnectTimeout=10' \
+       git clone {{ .overlay | quote }} "$DEST"; then
+    cat >&2 <<EOF
+work overlay clone failed: {{ .overlay }}
+
+The most likely cause is that this machine's SSH key is not yet registered
+with the git host. Add this box's public key to your account on the host,
+verify with 'ssh -T' against the host, then re-run 'chezmoi apply' — this
+step will retry automatically.
+EOF
+    exit 1
+  fi
 fi
 
 if [ -x "$DEST/install.sh" ]; then

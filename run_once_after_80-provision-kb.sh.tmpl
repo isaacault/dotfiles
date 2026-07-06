@@ -1,0 +1,32 @@
+{{- $kb := dig "kb" "" . -}}
+{{ if $kb -}}
+#!/bin/bash
+# SPDX-License-Identifier: MIT
+# Personal knowledge-base provisioning. Runs once per machine, only when init
+# was answered with a non-empty kb repo URL. Clones the KB repo (private) to
+# ~/kb. Renders empty (= skipped) otherwise. The repo URL is per-machine DATA,
+# never committed — it lives only in this machine's untracked config.
+# (dig tolerates machines whose config predates the kb key — they skip cleanly
+# until re-init rather than erroring on a missing key.)
+set -euo pipefail
+
+DEST="$HOME/kb"
+
+if [ ! -d "$DEST/.git" ]; then
+  # accept-new handles first-contact host keys on non-standard SSH ports without
+  # a manual known_hosts entry, while still pinning the key on later connects.
+  if ! GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=accept-new -o ConnectTimeout=10" \
+       git clone {{ $kb | quote }} "$DEST"; then
+    cat >&2 <<'EOF'
+error: could not clone the knowledge-base repo into ~/kb.
+This is usually an SSH access problem — the machine's SSH key is not yet
+registered with the git host (or the host is unreachable from here).
+Register the key, then re-run `chezmoi apply` to retry.
+EOF
+    exit 1
+  fi
+  echo "knowledge base cloned to $DEST"
+  echo "to restore a note snapshot (if you have an export tarball):"
+  echo "  $DEST/bin/kb import <snapshot>"
+fi
+{{ end -}}

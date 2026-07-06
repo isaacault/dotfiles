@@ -1,0 +1,20 @@
+{{ if .work -}}
+# Work context (work machines only)
+
+@~/.work-dotfiles/claude/CLAUDE.work.md
+
+{{ end -}}
+# Personal knowledge base
+
+A personal knowledge base (OKF markdown vault) lives at `~/kb`. Consult it whenever a task
+could benefit from durable personal context — preferences, routines, prior decisions, recurring
+projects, or earlier notes — regardless of which project you're working in.
+
+- **Concepts** live under `~/kb/vault/` (e.g. the link `/tasks/foo.md` is `~/kb/vault/tasks/foo.md`).
+- **Durable user facts** (preferences, routines, behavioral corrections) live under `~/kb/memory/`.
+- **To find something:** grep/read under `~/kb/vault/` and `~/kb/memory/`. The leaf concept files
+  are the source of truth; `index.md` / `backlog.md` are generated projections — don't rely on them
+  for content.
+- **Read-only by default.** Before *writing to or maintaining* the KB, follow the protocol in
+  `~/kb/CLAUDE.md` (capture, filing rules, linking, reindex/lint). Don't create concept files at
+  the KB repo root, and never hand-edit generated index files.
