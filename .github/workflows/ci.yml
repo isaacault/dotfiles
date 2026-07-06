@@ -25,7 +25,8 @@ jobs:
             --promptBool "${{ matrix.flags }}" \
             --promptString "email=ci@example.com,overlay="
       - name: Verify applied state matches source
-        run: "$HOME/.local/bin/chezmoi" verify --source "$GITHUB_WORKSPACE"
+        run: |
+          "$HOME/.local/bin/chezmoi" verify --source "$GITHUB_WORKSPACE"
       - name: Assert no secrets deployed
         # grep every file chezmoi deployed (chezmoi managed), not a hand-picked
         # subset, for known token prefixes; externals are third-party plugin
