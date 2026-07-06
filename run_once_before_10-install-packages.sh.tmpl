@@ -36,4 +36,12 @@ if ! command -v starship >/dev/null 2>&1; then
   curl -fsSL https://starship.rs/install.sh | sh -s -- -y -b "$HOME/.local/bin"
 fi
 {{ end -}}
+
+# Claude Code CLI (cross-platform): official native installer drops it in
+# ~/.local/share/claude and symlinks ~/.local/bin/claude — already on PATH via
+# dot_profile. Required by the work overlay's claude/install-mcp.sh. The
+# ~/.local/bin/claude test keeps this idempotent even before PATH is reloaded.
+if ! command -v claude >/dev/null 2>&1 && [ ! -x "$HOME/.local/bin/claude" ]; then
+  curl -fsSL https://claude.ai/install.sh | bash
+fi
 {{ end -}}
