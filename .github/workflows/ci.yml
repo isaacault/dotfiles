@@ -10,8 +10,8 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest]
         flags:
-          - "work=false,gui=true,provision=false"
-          - "work=true,gui=false,provision=false"
+          - "work=false,gui=true,provision=false,devtools=false"
+          - "work=true,gui=false,provision=false,devtools=false"
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4

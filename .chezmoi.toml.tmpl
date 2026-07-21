@@ -1,18 +1,20 @@
 {{- /* Machine identity: prompted once at `chezmoi init`, stored in the local
        (untracked) ~/.config/chezmoi/chezmoi.toml. Re-init never re-prompts.
        Prompt strings are deliberately the bare flag names so scripted init
-       works: chezmoi init --promptBool work=true,gui=false,provision=false \
+       works: chezmoi init --promptBool work=true,gui=false,provision=false,devtools=true \
                            --promptString email=me@work.example,overlay=git@host:me/overlay.git,kb=git@host:me/kb.git
        work      — work machine: prompts for work git email + an optional
                    overlay repo URL. Work values are per-machine DATA, never
                    committed: they live only in this machine's untracked config.
        gui       — GUI desktop: sway/waybar/... (linux), aerospace (mac)
        provision — install packages on first apply (needs sudo or brew)
+       devtools  — install enhanced CLI dev tools (eza, bat, zoxide, uv, glab, node)
        kb        — optional personal knowledge-base repo URL; when set, cloned
                    to ~/kb on first apply. Empty (default) skips it. */ -}}
 {{- $work := promptBoolOnce . "work" "work" false -}}
 {{- $gui := promptBoolOnce . "gui" "gui" false -}}
 {{- $provision := promptBoolOnce . "provision" "provision" false -}}
+{{- $devtools := promptBoolOnce . "devtools" "devtools" false -}}
 {{- $kb := promptStringOnce . "kb" "kb" "" -}}
 {{- $email := "isaac.ault@gmail.com" -}}
 {{- $overlay := "" -}}
@@ -25,6 +27,7 @@
     work = {{ $work }}
     gui = {{ $gui }}
     provision = {{ $provision }}
+    devtools = {{ $devtools }}
     email = {{ $email | quote }}
     overlay = {{ $overlay | quote }}
     kb = {{ $kb | quote }}

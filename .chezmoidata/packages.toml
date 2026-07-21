@@ -5,3 +5,11 @@
 apt = ["git", "curl", "tmux", "zsh", "fzf", "ripgrep", "fd-find", "xclip", "jq", "build-essential"]
 dnf = ["git", "curl", "tmux", "zsh", "fzf", "ripgrep", "fd-find", "xclip", "jq", "gcc", "gcc-c++", "make"]
 brew = ["git", "tmux", "zsh", "fzf", "ripgrep", "fd", "jq", "neovim", "starship"]
+
+# Package lists consumed by run_once_before_15-devtools.sh.tmpl
+# (only when the machine was initialized with devtools=true).
+# Linux: apt/dnf cover what's packaged; curl installers handle the rest.
+[devtools]
+apt = ["bat", "eza", "nodejs", "npm"]
+dnf = ["bat", "eza", "nodejs", "npm"]
+brew = ["bat", "eza", "zoxide", "uv", "glab", "node"]
