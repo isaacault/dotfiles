@@ -2,7 +2,7 @@ vim.g.mapleader = " "
 vim.g.maplocalleader = "\\"
 
 -- Explore file tree.
-vim.keymap.set("n", "<leader>e", vim.cmd.Ex)
+-- <leader>e cycles sidebars (explorer -> p4 CL -> none): see plugins/nvim-tree.lua
 
 -- Move visual selection
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
