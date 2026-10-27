@@ -32,3 +32,4 @@ scripts/**
 # mac GUI module
 .aerospace.toml
 {{ end }}
+.config/zsh/plugins/zsh-syntax-highlighting/.revision-hash

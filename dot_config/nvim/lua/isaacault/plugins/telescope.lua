@@ -10,6 +10,10 @@ return {
         -- For major updates, this must be adjusted manually.
         version = "^1.0.0",
       },
+      {
+        "nvim-telescope/telescope-fzf-native.nvim",
+        build = "make",
+      },
     },
     keys = {
       {
@@ -19,7 +23,14 @@ return {
       },
       {
         '<leader>pf',
-        "<cmd>Telescope git_files<cr>",
+        function()
+          local in_git = vim.fn.system("git rev-parse --is-inside-work-tree 2>/dev/null")
+          if vim.trim(in_git) == "true" then
+            require("telescope.builtin").git_files()
+          else
+            require("telescope.builtin").find_files()
+          end
+        end,
         desc = "Find file in git project"
       },
       {
@@ -38,6 +49,7 @@ return {
     config = function()
       require("telescope").setup {
         extensions = {
+          fzf = {},
           live_grep_args = {
             auto_quoting = true, -- enable/disable auto-quoting
             mappings = {         -- extend mappings
@@ -49,6 +61,7 @@ return {
         },
       }
       require("telescope").load_extension("live_grep_args") -- load it after `setup`
+      require("telescope").load_extension("fzf")
     end,
   },
 }
