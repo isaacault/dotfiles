@@ -1,5 +1,10 @@
 "$schema" = 'https://starship.rs/config-schema.json'
 
+# Default is 30ms; large/slow directories (e.g. p4 workspace trees) can take
+# longer to scan for git/language markers, triggering scan timeout warnings.
+# Bump it so those scans get a fair chance to finish.
+scan_timeout = 100
+
 format = """
 $username\
 $hostname\
