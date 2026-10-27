@@ -79,9 +79,8 @@ must be registered with the git host before first apply.
 
 Done:
 
-- **AI tooling**: curated subset of `~/.claude/` — `CLAUDE.md` (global
-  instructions, work-import block gated on `work`), `settings.json` (home paths
-  templated via `.chezmoi.homeDir`), `keybindings.json`. Config only, never
+- **AI tooling**: `~/.claude/keybindings.json` only. `CLAUDE.md` and
+  `settings.json` live in a separate private repo. Config only, never
   state/credentials (`~/.claude.json`, sessions, history, etc. stay out), and
   never the work-internal, externally-managed `skills/`. `commands/`/`agents/`
   are empty so nothing to fold in yet.

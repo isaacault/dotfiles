@@ -29,7 +29,7 @@ To change an answer later: edit that file, then `chezmoi apply`.
 - **tmux** — `~/.config/tmux/tmux.conf`; plugins pulled as chezmoi externals (tpm, catppuccin, resurrect, continuum)
 - **nvim** — full lazy.nvim config, `lazy-lock.json` pins plugins
 - **git** — identity templated by machine kind; `~/.gitconfig.local` for machine-local extras
-- **Claude Code** — curated subset of `~/.claude`: `CLAUDE.md` (global instructions), `settings.json`, `keybindings.json` — config only, never state/credentials or work-internal skills
+- **Claude Code** — `keybindings.json` only; `CLAUDE.md`, `settings.json` and skills live in a separate private repo
 - **GUI (optional)** — sway, swaync, waybar, alacritty, aerospace
 - **work (optional)** — a private overlay repo owns all work-specific config;
   see below

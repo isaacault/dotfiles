@@ -38,11 +38,8 @@ grep -q isaac.ault@gmail.com "$H1/.gitconfig" || fail "personal email not set"
 [ ! -e "$H1/.work-dotfiles" ]                 || fail "work overlay ran (work=false)"
 [ ! -e "$H1/README.md" ]                      || fail "README leaked"
 [ ! -e "$H1/docs" ]                           || fail "docs leaked"
-# ~/.claude curated subset deploys everywhere; work block gated off on personal
-[ -f "$H1/.claude/CLAUDE.md" ]                || fail "claude CLAUDE.md missing"
+# ~/.claude: only keybindings.json is managed (CLAUDE.md/settings.json live in a private repo)
 [ -f "$H1/.claude/keybindings.json" ]         || fail "claude keybindings missing"
-grep -q "$H1/kb" "$H1/.claude/settings.json"  || fail "claude settings homeDir not templated"
-! grep -q "Work context" "$H1/.claude/CLAUDE.md" || fail "work block leaked (work=false)"
 [ ! -e "$H1/kb" ]                             || fail "kb cloned (kb unset)"
 ! grep -qrE '(nvapi-|glpat-|ghp_)' "$H1/.bashrc" "$H1/.gitconfig" "$H1/.config/zsh" \
                                               || fail "secret pattern in applied home"
@@ -84,7 +81,6 @@ grep -q '\.local/share' "$H2/.zshenv"         || fail "XDG_DATA_HOME not standar
 [ ! -e "$H2/.config/sway" ]                   || fail "sway leaked (gui=false)"
 [ ! -e "$H2/.config/alacritty" ]              || fail "alacritty leaked (gui=false)"
 [ -d "$H2/kb/.git" ]                          || fail "kb not cloned (kb set)"
-grep -q "Work context" "$H2/.claude/CLAUDE.md" || fail "work block missing (work=true)"
 rm -rf "$H2" "$OVR" "$KBR"
 echo "case 2 (work+nogui) OK"
 
