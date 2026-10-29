@@ -1,0 +1,93 @@
+[general]
+import = ["~/.config/alacritty/catppuccin-mocha.toml"]
+
+[env]
+TERM = "alacritty"
+
+[window]
+opacity = 0.85
+blur = true
+# "Buttonless" keeps rounded corners on macOS; "None" gives squared corners.
+decorations = "None"
+padding = { x = 8, y = 6 }
+dynamic_padding = true
+option_as_alt = "Both"
+
+[window.class]
+general = "Alacritty"
+instance = "Alacritty"
+
+[scrolling]
+history = 100000
+
+[font]
+size = 18
+# Extra line spacing; try 0-4.
+offset = { x = 0, y = 0 }
+glyph_offset = { x = 0, y = 0 }
+
+[font.normal]
+family = "JetBrainsMono Nerd Font"
+style = "Regular"
+
+[font.bold]
+family = "JetBrainsMono Nerd Font"
+style = "Bold"
+
+[font.italic]
+family = "JetBrainsMono Nerd Font"
+style = "Italic"
+
+[font.bold_italic]
+family = "JetBrainsMono Nerd Font"
+style = "Bold Italic"
+
+[colors]
+draw_bold_text_with_bright_colors = false
+
+[cursor]
+style = { shape = "Block", blinking = "Off" }
+unfocused_hollow = true
+
+[selection]
+save_to_clipboard = true
+
+[mouse]
+hide_when_typing = true
+
+[[keyboard.bindings]]
+# Shift+Enter inserts a newline (Claude Code etc.)
+key = "Return"
+mods = "Shift"
+chars = "\u001B\r"
+
+[[keyboard.bindings]]
+key = "Left"
+mods = "Command"
+chars = "\u0001"   # start of line
+
+[[keyboard.bindings]]
+key = "Right"
+mods = "Command"
+chars = "\u0005"   # end of line
+
+[[keyboard.bindings]]
+key = "Backspace"
+mods = "Command"
+chars = "\u0015"   # delete to start of line
+
+# macOS: "open". On Linux change command to "xdg-open".
+[[hints.enabled]]
+command = "open"
+hyperlinks = true
+post_processing = true
+persist = false
+mouse.enabled = true
+mouse.mods = "Command"
+binding = { key = "U", mods = "Control|Shift" }
+regex = "(ipfs:|ipns:|magnet:|mailto:|gemini://|gopher://|https://|http://|news:|file:|git://|ssh:|ftp://)[^\u0000-\u001F\u007F-\u009F<>\"\\s{-}\\^⟨⟩‘]+"
+
+# [bell]
+# animation = "EaseOutExpo"
+# duration = 100
+# command = { program = "osascript", args = ["-e", "display notification \"Claude needs you\" with title \"Claude Code\""] }

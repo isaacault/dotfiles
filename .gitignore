@@ -1,2 +1,10 @@
 # Claude Code session artifacts (worktrees, local settings) — never part of the dotfiles
 .claude/
+
+# Fetched by scripts/fetch-plugins.sh, never tracked
+tmux/.config/tmux/plugins/
+zsh/.config/zsh/plugins/
+# Machine-local state and overrides
+zsh/.config/zsh/.zsh_history
+*.local
+*.work
