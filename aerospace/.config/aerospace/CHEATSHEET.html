@@ -1,0 +1,75 @@
+<!doctype html><meta charset="utf-8">
+<style>
+:root{color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;padding:26px 30px;font:14px/1.45 -apple-system,BlinkMacSystemFont,sans-serif;background:#1c1c20;color:#e8e8ec}
+h1{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:#8e8e99;margin:0 0 18px;font-weight:600}
+h1 span{float:right;letter-spacing:0;text-transform:none}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:22px 34px}
+h2{font-size:15px;margin:0 0 8px;color:#fff}
+.row{display:flex;justify-content:space-between;align-items:baseline;padding:3px 0;border-bottom:1px solid #2c2c33}
+.row span{color:#b8b8c2}
+kbd{font:600 12px ui-monospace,Menlo,monospace;background:#2e2e36;border:1px solid #44444e;border-bottom-width:2px;border-radius:5px;padding:1px 6px;margin-left:3px;color:#fff;white-space:nowrap}
+.note{color:#8e8e99;font-size:12.5px;margin-top:8px}
+.diag{display:flex;gap:6px;align-items:center;margin:8px 0 2px;font-size:12px;color:#8e8e99}
+.box{display:flex;gap:3px;padding:3px;border:1px solid #55555f;border-radius:5px;width:92px;height:34px}
+.box i{flex:1;border-radius:3px;background:#3b6fd8}
+.box.g i:nth-child(n+2){background:#d8963b}
+.box.col{flex-direction:column}
+.box .grp{flex:2;display:flex;gap:2px;border:1px dashed #d8963b;border-radius:3px;padding:2px}
+.box .grp i{background:#d8963b}
+</style>
+<h1>AeroSpace <span>press any key to close</span></h1>
+<div class="grid">
+
+<div>
+<h2>Workspaces</h2>
+<div class="row"><span>Go to workspace 1–10</span><b><kbd>⌘</kbd><kbd>1</kbd>…<kbd>0</kbd></b></div>
+<div class="row"><span>Send window there</span><b><kbd>⌘</kbd><kbd>⇧</kbd><kbd>1</kbd>…<kbd>0</kbd></b></div>
+<div class="row"><span>Back to previous</span><b><kbd>⌘</kbd><kbd>Tab</kbd></b></div>
+<div class="row"><span>Move workspace to other monitor</span><b><kbd>⌘</kbd><kbd>⇧</kbd><kbd>Tab</kbd></b></div>
+<div class="note">2 Terminal · 3 Chrome · 4 Cursor · 7 Spotify · 8 Slack · 9 Outlook · 10 Teams</div>
+</div>
+
+<div>
+<h2>Layout of the current group</h2>
+<div class="row"><span>Side by side ⇄ stacked top/bottom</span><b><kbd>⌘</kbd><kbd>E</kbd></b></div>
+<div class="row"><span>Tabbed ⇄ stacked (overlaid)</span><b><kbd>⌘</kbd><kbd>S</kbd></b></div>
+<div class="row"><span>Float / tile window</span><b><kbd>⌘</kbd><kbd>Esc</kbd></b></div>
+<div class="row"><span>Fullscreen</span><b><kbd>⌘</kbd><kbd>⇧</kbd><kbd>F</kbd></b></div>
+<div class="note">Press the same key again to flip direction.</div>
+</div>
+
+<div>
+<h2>Moving around</h2>
+<div class="row"><span>Focus ← ↓ ↑ →</span><b><kbd>⌘</kbd><kbd>H J K L</kbd></b></div>
+<div class="row"><span>Move window</span><b><kbd>⌘</kbd><kbd>⇧</kbd><kbd>H J K L</kbd></b></div>
+<div class="row"><span>Resize mode (esc to leave)</span><b><kbd>⌘</kbd><kbd>⇧</kbd><kbd>R</kbd></b></div>
+<div class="note">Arrow keys work too.</div>
+</div>
+
+<div>
+<h2>Service mode <kbd>⌘</kbd><kbd>⇧</kbd><kbd>S</kbd>, then…</h2>
+<div class="row"><span>Reset a messy layout</span><b><kbd>R</kbd></b></div>
+<div class="row"><span>Toggle floating</span><b><kbd>F</kbd></b></div>
+<div class="row"><span>Close all other windows</span><b><kbd>⌫</kbd></b></div>
+<div class="row"><span>Presentation mode on / off</span><b><kbd>B</kbd> / <kbd>⇧B</kbd></b></div>
+<div class="row"><span>Reload config</span><b><kbd>Esc</kbd></b></div>
+</div>
+
+<div style="grid-column:1/3">
+<h2>Group windows: split &amp; join</h2>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:34px">
+<div>
+<div class="row"><span><b style="color:#fff">Split</b> — next window opens beside / below this one</span><b><kbd>⌥</kbd><kbd>G</kbd> / <kbd>⌥</kbd><kbd>V</kbd></b></div>
+<div class="note">Use before opening a window: the focused window becomes its own slot to share.</div>
+</div>
+<div>
+<div class="row"><span><b style="color:#fff">Join</b> — merge focused window with its neighbor</span><b><kbd>⌘</kbd><kbd>G</kbd> then <kbd>H J K L</kbd></b></div>
+<div class="diag"><div class="box"><i></i><i></i><i></i></div>→ focus middle, <kbd>⌘G</kbd> <kbd>L</kbd> →<div class="box"><i></i><div class="grp"><i></i><i></i></div></div></div>
+<div class="note">Then <kbd>⌘</kbd><kbd>S</kbd> tabs just that group.</div>
+</div>
+</div>
+</div>
+
+</div>

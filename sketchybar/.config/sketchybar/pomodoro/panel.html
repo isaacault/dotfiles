@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Pomodoro</title>
+<style>
+  :root {
+    --bg: #151320;
+    --card: #22212c;
+    --line: #302c45;
+    --text: #f8f8f2;
+    --dim: #a3a7b3;
+    --bar: #f8f8f2;
+    --partial: #7f8490;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  html, body { height: 100%; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font: 14px/1.4 "SpaceMono Nerd Font", ui-monospace, Menlo, monospace;
+    display: flex; flex-direction: column;
+    padding: 22px 26px 18px;
+    overflow: hidden;
+    user-select: none;
+  }
+  header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+  nav { display: flex; gap: 6px; }
+  button, .tab {
+    font: inherit; color: var(--dim); background: transparent; border: 0;
+    padding: 5px 12px; border-radius: 9px; cursor: pointer;
+  }
+  button:hover { color: var(--text); }
+  .tab.on { background: var(--line); color: var(--text); }
+  .range { display: flex; align-items: center; gap: 4px; }
+  .range span { min-width: 190px; text-align: center; }
+  .range button:disabled { opacity: .25; cursor: default; }
+  main { flex: 1; overflow-y: auto; }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 18px; }
+  .stat { background: var(--card); border-radius: 12px; padding: 12px 14px; }
+  .stat b { display: block; font-size: 22px; font-weight: 700; }
+  .stat small { color: var(--dim); }
+  h2 { font-size: 12px; font-weight: 400; color: var(--dim); text-transform: uppercase;
+       letter-spacing: .08em; margin: 4px 0 10px; }
+  .dots { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+  .dot { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--partial); }
+  .dot.on { background: var(--bar); border-color: var(--bar); }
+  .list { display: flex; flex-direction: column; gap: 6px; }
+  .row { display: flex; justify-content: space-between; background: var(--card);
+         border-radius: 10px; padding: 9px 14px; }
+  .row .tag { color: var(--dim); }
+  .row.partial .when { color: var(--dim); }
+  .empty { color: var(--dim); padding: 26px 0; }
+  .chart { background: var(--card); border-radius: 12px; padding: 18px 16px 10px; }
+  .plot { position: relative; height: 220px; display: flex; align-items: flex-end; gap: 6px; }
+  .col { flex: 1; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; }
+  .seg-done { background: var(--bar); border-radius: 4px 4px 0 0; min-height: 0; }
+  .seg-partial { background: repeating-linear-gradient(45deg, var(--partial) 0 3px, transparent 3px 6px);
+                 border-radius: 4px 4px 0 0; }
+  .goal { position: absolute; left: 0; right: 0; border-top: 1px dashed var(--dim); }
+  .goal i { position: absolute; right: 0; top: -18px; font-style: normal; font-size: 11px; color: var(--dim); }
+  .labels { display: flex; gap: 6px; margin-top: 8px; color: var(--dim); font-size: 11px; }
+  .labels div { flex: 1; text-align: center; }
+  .labels.dense div { font-size: 10px; }
+  .legend { display: flex; gap: 16px; color: var(--dim); font-size: 12px; margin: 10px 0 0; }
+  .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
+  .form { display: grid; grid-template-columns: 1fr auto; gap: 6px 24px; background: var(--card);
+          border-radius: 12px; padding: 14px 18px; margin-bottom: 18px; align-items: center; }
+  .form label { padding: 8px 0; }
+  .form small { display: block; color: var(--dim); }
+  input[type=number] {
+    width: 80px; background: var(--bg); color: var(--text); border: 1px solid var(--line);
+    border-radius: 8px; padding: 6px 8px; font: inherit; text-align: right;
+  }
+  input[type=checkbox] { width: 18px; height: 18px; accent-color: var(--text); }
+  .saved { color: var(--dim); height: 18px; }
+  footer { margin-top: 10px; color: var(--dim); font-size: 11px; display: flex; justify-content: space-between; }
+</style>
+</head>
+<body>
+<header>
+  <nav id="tabs"></nav>
+  <div class="range" id="range"></div>
+</header>
+<main id="main"></main>
+<footer><span>← → change period · 1–4 switch view · esc close</span><span id="streak"></span></footer>
+
+<script>
+// Keep in sync with `conf` in items/widgets/pomodoro.lua.
+const DEFAULTS = { focus_min: 25, short_min: 5, long_min: 15, sessions_per_long: 4, goal: 8,
+                   chime: true, invert: true, banner: true };
+const TABS = ["Today", "Week", "Month", "Settings"];
+const DAY = 86400000;
+
+let sessions = [];
+let conf = { ...DEFAULTS };
+let tab = 0;
+let offset = 0; // periods back from the current one
+
+function init([log, confText]) {
+  sessions = log.split("\n").map(l => l.trim().split(" ")).filter(p => p.length === 4)
+    .map(([t, status, planned, focused]) => ({ end: +t * 1000, status, planned: +planned, focused: +focused }));
+  for (const line of confText.split("\n")) {
+    const m = line.match(/^(\w+)=(\S+)$/);
+    if (!m || !(m[1] in DEFAULTS)) continue;
+    conf[m[1]] = typeof DEFAULTS[m[1]] === "boolean" ? m[2] === "true" : +m[2];
+  }
+  render();
+}
+
+const pad = n => String(n).padStart(2, "0");
+const dayKey = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const startOfDay = d => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+const addDays = (d, n) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
+const fmtDur = s => {
+  const m = Math.round(s / 60);
+  return m >= 60 ? `${Math.floor(m / 60)}h ${pad(m % 60)}m` : `${m}m`;
+};
+const fmtTime = ms => { const d = new Date(ms); return `${pad(d.getHours())}:${pad(d.getMinutes())}`; };
+
+function byDay() {
+  const days = {};
+  for (const s of sessions) {
+    const k = dayKey(new Date(s.end));
+    const d = days[k] ||= { done: 0, doneSecs: 0, partialSecs: 0, items: [] };
+    if (s.status === "done") { d.done++; d.doneSecs += s.focused; } else d.partialSecs += s.focused;
+    d.items.push(s);
+  }
+  return days;
+}
+
+function totals(days, keys) {
+  const t = { done: 0, doneSecs: 0, partialSecs: 0, active: 0 };
+  for (const k of keys) {
+    const d = days[k]; if (!d) continue;
+    t.done += d.done; t.doneSecs += d.doneSecs; t.partialSecs += d.partialSecs;
+    if (d.done) t.active++;
+  }
+  return t;
+}
+
+function streak(days) {
+  let n = 0, d = startOfDay(new Date());
+  if (!days[dayKey(d)]?.done) d = addDays(d, -1); // today may not have started yet
+  while (days[dayKey(d)]?.done) { n++; d = addDays(d, -1); }
+  return n;
+}
+
+function statBox(value, label) { return `<div class="stat"><b>${value}</b><small>${label}</small></div>`; }
+
+function statsRow(t, avgLabel, avg) {
+  return `<div class="stats">
+    ${statBox(t.done, "sessions")}
+    ${statBox(fmtDur(t.doneSecs), "focused")}
+    ${statBox(t.partialSecs ? fmtDur(t.partialSecs) : "–", "partial (abandoned)")}
+    ${statBox(avg, avgLabel)}
+  </div>`;
+}
+
+function viewToday(days) {
+  const date = addDays(startOfDay(new Date()), -offset);
+  const d = days[dayKey(date)] || { done: 0, doneSecs: 0, partialSecs: 0, items: [] };
+  const dots = Array.from({ length: Math.max(conf.goal, d.done) },
+    (_, i) => `<div class="dot${i < d.done ? " on" : ""}"></div>`).join("");
+  const items = d.items.slice().sort((a, b) => a.end - b.end).map(s => {
+    const start = s.end - s.focused * 1000;
+    const done = s.status === "done";
+    return `<div class="row${done ? "" : " partial"}">
+      <span class="when">${fmtTime(start)} – ${fmtTime(s.end)}</span>
+      <span class="tag">${done ? "completed" : "abandoned"} · ${fmtDur(s.focused)}${done ? "" : ` of ${fmtDur(s.planned)}`}</span>
+    </div>`;
+  }).join("");
+  const pct = Math.min(100, Math.round(d.done / conf.goal * 100));
+  return statsRow(d, "of daily goal", `${d.done}/${conf.goal} · ${pct}%`)
+    + `<h2>Goal</h2><div class="dots">${dots}</div>`
+    + `<h2>Sessions</h2>` + (items ? `<div class="list">${items}</div>` : `<div class="empty">No sessions recorded.</div>`);
+}
+
+function chart(days, dates, labelFor, dense) {
+  const goalSecs = conf.goal * conf.focus_min * 60;
+  const values = dates.map(d => days[dayKey(d)] || { doneSecs: 0, partialSecs: 0 });
+  const max = Math.max(goalSecs, ...values.map(v => v.doneSecs + v.partialSecs)) * 1.05;
+  const cols = values.map(v => `<div class="col" title="${fmtDur(v.doneSecs)} focused">
+      <div class="seg-partial" style="height:${v.partialSecs / max * 100}%"></div>
+      <div class="seg-done" style="height:${v.doneSecs / max * 100}%"></div></div>`).join("");
+  const labels = dates.map(labelFor).map(l => `<div>${l}</div>`).join("");
+  return `<div class="chart">
+    <div class="plot">${cols}
+      <div class="goal" style="bottom:${goalSecs / max * 100}%"><i>goal ${fmtDur(goalSecs)}</i></div></div>
+    <div class="labels${dense ? " dense" : ""}">${labels}</div></div>
+    <div class="legend"><span><i style="background:var(--bar)"></i>completed</span>
+    <span><i style="background:var(--partial)"></i>abandoned</span></div>`;
+}
+
+function viewWeek(days) {
+  const today = startOfDay(new Date());
+  const monday = addDays(today, -((today.getDay() + 6) % 7) - offset * 7);
+  const dates = Array.from({ length: 7 }, (_, i) => addDays(monday, i));
+  const t = totals(days, dates.map(dayKey));
+  const avg = t.active ? fmtDur(t.doneSecs / t.active) : "–";
+  return statsRow(t, "avg per active day", avg)
+    + chart(days, dates, d => d.toLocaleDateString(undefined, { weekday: "short", day: "numeric" }), false);
+}
+
+function viewMonth(days) {
+  const now = new Date();
+  const first = new Date(now.getFullYear(), now.getMonth() - offset, 1);
+  const count = new Date(first.getFullYear(), first.getMonth() + 1, 0).getDate();
+  const dates = Array.from({ length: count }, (_, i) => addDays(first, i));
+  const t = totals(days, dates.map(dayKey));
+  const avg = t.active ? fmtDur(t.doneSecs / t.active) : "–";
+  return statsRow(t, "avg per active day", avg)
+    + chart(days, dates, d => (d.getDate() % 5 === 1 || d.getDate() === count) ? d.getDate() : "", true);
+}
+
+function viewSettings() {
+  const num = (key, label, hint) => `<label for="${key}">${label}<small>${hint}</small></label>
+    <input id="${key}" type="number" min="1" max="999" value="${conf[key]}">`;
+  const box = (key, label, hint) => `<label for="${key}">${label}<small>${hint}</small></label>
+    <input id="${key}" type="checkbox" ${conf[key] ? "checked" : ""}>`;
+  return `<h2>Timer</h2><div class="form">
+      ${num("focus_min", "Focus", "minutes")}
+      ${num("short_min", "Short break", "minutes")}
+      ${num("long_min", "Long break", "minutes")}
+      ${num("sessions_per_long", "Sessions before long break", "focus sessions")}
+      ${num("goal", "Daily goal", "focus sessions per day")}
+    </div>
+    <h2>When a phase ends</h2><div class="form">
+      ${box("chime", "Chime", "soft sound, played once")}
+      ${box("invert", "Highlight bar item", "inverts until you click or press alt-p")}
+      ${box("banner", "macOS notification", "banner in the corner")}
+    </div>
+    <div class="saved" id="saved"></div>`;
+}
+
+function save() {
+  const next = {};
+  for (const key of Object.keys(DEFAULTS)) {
+    const el = document.getElementById(key);
+    if (!el) return;
+    if (typeof DEFAULTS[key] === "boolean") next[key] = el.checked;
+    else {
+      const v = Math.max(1, Math.min(999, Math.round(+el.value) || DEFAULTS[key]));
+      next[key] = v;
+    }
+  }
+  conf = next;
+  webkit.messageHandlers.save.postMessage(next);
+  document.getElementById("saved").textContent = "Saved. Applies to the next phase.";
+}
+
+function periodLabel() {
+  const today = startOfDay(new Date());
+  if (tab === 0) {
+    const d = addDays(today, -offset);
+    return offset === 0 ? "Today" : offset === 1 ? "Yesterday"
+      : d.toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short" });
+  }
+  if (tab === 1) {
+    const mon = addDays(today, -((today.getDay() + 6) % 7) - offset * 7);
+    const f = d => d.toLocaleDateString(undefined, { day: "numeric", month: "short" });
+    return offset === 0 ? "This week" : `${f(mon)} – ${f(addDays(mon, 6))}`;
+  }
+  const m = new Date(today.getFullYear(), today.getMonth() - offset, 1);
+  return offset === 0 ? "This month" : m.toLocaleDateString(undefined, { month: "long", year: "numeric" });
+}
+
+function render() {
+  const days = byDay();
+  document.getElementById("tabs").innerHTML = TABS.map((t, i) =>
+    `<button class="tab${i === tab ? " on" : ""}" onclick="go(${i})">${t}</button>`).join("");
+  document.getElementById("range").innerHTML = tab === 3 ? "" :
+    `<button onclick="step(1)">←</button><span>${periodLabel()}</span>
+     <button onclick="step(-1)" ${offset === 0 ? "disabled" : ""}>→</button>`;
+  document.getElementById("main").innerHTML =
+    [viewToday, viewWeek, viewMonth, viewSettings][tab](days);
+  const s = streak(days);
+  document.getElementById("streak").textContent = s ? `${s}-day streak` : "";
+  if (tab === 3) document.querySelectorAll("input").forEach(el => el.addEventListener("change", save));
+}
+
+function go(i) { tab = i; offset = 0; render(); }
+function step(n) { offset = Math.max(0, offset + n); render(); }
+
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape") webkit.messageHandlers.close.postMessage(0);
+  else if (e.target.tagName === "INPUT" && e.target.type === "number") return;
+  else if (e.key === "ArrowLeft" && tab !== 3) step(1);
+  else if (e.key === "ArrowRight" && tab !== 3) step(-1);
+  else if (e.key >= "1" && e.key <= "4") go(+e.key - 1);
+});
+</script>
+</body>
+</html>

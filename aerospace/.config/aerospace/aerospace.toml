@@ -1,0 +1,234 @@
+# AEROSPACE CONFIG
+# Cheat sheet (also in ~/.config/aerospace/CHEATSHEET.md; show it with alt-/ or cmd-shift-s then /)
+#   cmd-1..0         go to workspace          cmd-shift-1..0   send window to workspace
+#   cmd-h/j/k/l      focus window             cmd-shift-h/j/k/l move window
+#   cmd-e            tiles (press again: flips side-by-side <-> top/bottom)
+#   cmd-s            tabbed/stacked (press again: flips tabbed <-> stacked)
+#   cmd-esc          toggle floating          cmd-shift-f      fullscreen
+#   cmd-g + h/j/k/l  join: group focused window with its neighbor into a container
+#   alt-g / alt-v    split: next window opens beside / below the focused one
+#https://github.com/edunfelt/base16-rose-pine-scheme/blob/main/assets/palette.png
+start-at-login = true
+
+after-login-command = []
+
+after-startup-command = [
+     # 'exec-and-forget /opt/homebrew/opt/borders/bin/borders active_color=0xCFFFBE69 inactive_color=0x33434c5e width=6.0'
+    'exec-and-forget /opt/homebrew/opt/sketchybar/bin/sketchybar'
+]
+
+exec-on-workspace-change = [
+  '/bin/bash',
+  '-c',
+  'sketchybar --trigger aerospace_workspace_changed FOCUSED_WORKSPACE=$AEROSPACE_FOCUSED_WORKSPACE'
+]
+
+on-focus-changed = [
+  # 'move-mouse window-lazy-center',
+  'exec-and-forget sketchybar --trigger front_app_switched',
+  'exec-and-forget sketchybar --trigger update_windows'
+]
+
+enable-normalization-flatten-containers = false
+enable-normalization-opposite-orientation-for-nested-containers = false
+
+accordion-padding = 30
+
+default-root-container-layout = 'tiles'
+
+default-root-container-orientation = 'auto'
+
+key-mapping.preset = 'qwerty'
+
+[gaps]
+#outer.bottom numbers have to match presentation.sh variables. built-in retina display is excluded from presentation mode, so this only works on external monitors.
+outer.bottom =        [{monitor.'^built-in retina display$' = 0 }, 5]
+outer.top =        [{monitor.'^built-in retina display$' = 15 }, 46]
+outer.left =       0
+outer.right =      0
+inner.horizontal = 5
+inner.vertical =   5
+
+[exec]                   # Again, you don't need to copy all config sections to your config.
+inherit-env-vars = true  # If you don't touch "exec" section,
+[exec.env-vars]          # it will fallback to "default-config.toml"
+PATH = '/opt/homebrew/bin:/opt/homebrew/sbin:${PATH}'
+
+[mode.main.binding]
+cmd-esc = 'layout floating tiling'
+cmd-e = 'layout tiles horizontal vertical' # Default
+cmd-s = 'layout accordion horizontal vertical' # Tabbed / Stacking 
+cmd-shift-r = [
+  'mode resize',
+  'exec-and-forget sketchybar --trigger send_message MESSAGE="RESIZE MODE" HOLD="true"'
+]
+
+cmd-keypadMinus = 'resize smart -70'
+cmd-keypadPlus = 'resize smart +70'
+
+cmd-g = 'mode join'
+# cmd-q = [
+#   'close --quit-if-last-window'
+# ]
+#cmd-w = []
+
+# All possible keys:
+# - Letters.        a, b, c, ..., z
+# - Numbers.        0, 1, 2, ..., 9
+# - Keypad numbers. keypad0, keypad1, keypad2, ..., keypad9
+# - F-keys.         f1, f2, ..., f20
+# - Special keys.   minus, equal, period, comma, slash, backslash, quote, semicolon, backtick,
+#                   leftSquareBracket, rightSquareBracket, space, enter, esc, backspace, tab
+# - Keypad special. keypadClear, keypadDecimalMark, keypadDivide, keypadEnter, keypadEqual,
+#                   keypadMinus, keypadMultiply, keypadPlus
+# - Arrows.         left, down, up, right
+
+# All possible modifiers: cmd, alt, ctrl, shift
+
+cmd-ctrl-shift-f = 'macos-native-fullscreen'
+cmd-shift-f = 'fullscreen'
+
+alt-p = 'exec-and-forget /opt/homebrew/bin/sketchybar --trigger pomodoro_toggle'
+alt-shift-p = 'exec-and-forget /opt/homebrew/bin/sketchybar --trigger pomodoro_reset'
+alt-shift-slash = 'exec-and-forget pkill -x pomodoro-panel || ~/.config/sketchybar/pomodoro/pomodoro-panel' # pomodoro history & settings
+
+alt-g = 'split horizontal'
+alt-v = 'split vertical'
+
+cmd-h = 'focus --boundaries-action wrap-around-the-workspace left'
+cmd-j = 'focus --boundaries-action wrap-around-the-workspace down'
+cmd-k = 'focus --boundaries-action wrap-around-the-workspace up'
+cmd-l = 'focus --boundaries-action wrap-around-the-workspace right'
+cmd-left = 'focus --boundaries-action wrap-around-the-workspace left'
+cmd-down = 'focus --boundaries-action wrap-around-the-workspace down'
+cmd-up = 'focus --boundaries-action wrap-around-the-workspace up'
+cmd-right = 'focus --boundaries-action wrap-around-the-workspace right'
+
+cmd-shift-h = 'move left'
+cmd-shift-j = 'move down'
+cmd-shift-k = 'move up'
+cmd-shift-l = 'move right'
+cmd-shift-left = 'move left'
+cmd-shift-down = 'move down'
+cmd-shift-up = 'move up'
+cmd-shift-right = 'move right'
+
+#cmd-1 = 'summon-workspace 1'  # Notes
+cmd-1 = 'workspace 1'  # Notes
+cmd-2 = 'workspace 2'  # Terminal (Alacritty)
+cmd-3 = 'workspace 3'  # Browser (Chrome)
+cmd-4 = 'workspace 4'  # Editor (Cursor)
+cmd-5 = 'workspace 5'  #
+cmd-6 = 'workspace 6'  #
+cmd-7 = 'workspace 7'  # Music (Spotify)
+cmd-8 = 'workspace 8'  # Chat (Slack)
+cmd-9 = 'workspace 9'  # Mail (Outlook)
+cmd-0 = 'workspace 10' # Call (Teams)
+
+cmd-shift-1 = 'move-node-to-workspace 1'
+cmd-shift-2 = 'move-node-to-workspace 2'
+cmd-shift-3 = 'move-node-to-workspace 3'
+cmd-shift-4 = 'move-node-to-workspace 4'
+cmd-shift-5 = 'move-node-to-workspace 5'
+cmd-shift-6 = 'move-node-to-workspace 6'
+cmd-shift-7 = 'move-node-to-workspace 7'
+cmd-shift-8 = 'move-node-to-workspace 8'
+cmd-shift-9 = 'move-node-to-workspace 9'
+cmd-shift-0 = 'move-node-to-workspace 10'
+
+cmd-tab = 'workspace-back-and-forth'
+alt-slash = 'exec-and-forget pkill -x cheatsheet || ~/.config/aerospace/cheatsheet' # show cheat sheet
+cmd-shift-tab = 'move-workspace-to-monitor --wrap-around next'
+cmd-alt-h = []
+
+cmd-shift-s = [
+  'mode service',
+  'exec-and-forget sketchybar --trigger send_message MESSAGE="SERVICE MODE" HOLD="true"'
+]
+
+[mode.service.binding]
+esc = [
+ 'reload-config',
+ 'exec-and-forget sketchybar --trigger hide_message',
+ 'exec-and-forget sketchybar --reload',
+ 'mode main'
+]
+r = ['flatten-workspace-tree', 'mode main'] # reset layout
+#s = ['layout sticky tiling', 'mode main'] # sticky is not yet supported https://github.com/nikitabobko/AeroSpace/issues/2
+
+s = [
+    'exec-and-forget cat ~/.config/aerospace/shrugstring| pbcopy',
+   'exec-and-forget sketchybar --trigger hide_message',
+   'mode main'
+] 
+
+b = [
+   'exec-and-forget ~/.config/aerospace/presentation.sh on',
+   'exec-and-forget sketchybar --bar height=0',
+   'exec-and-forget sketchybar --trigger hide_message',
+   'mode main'
+]
+shift-b = [
+   'exec-and-forget ~/.config/aerospace/presentation.sh off',
+   'exec-and-forget sketchybar --bar height=36',
+   'exec-and-forget sketchybar --trigger hide_message',
+   'mode main'
+]
+
+slash = ['exec-and-forget ~/.config/aerospace/cheatsheet', 'mode main', 'exec-and-forget sketchybar --trigger hide_message']
+f = ['layout floating tiling', 'mode main'] # toggle floating for the focused window
+backspace = ['close-all-windows-but-current', 'mode main']
+
+[mode.resize.binding]
+keypadMinus = 'resize smart -70'
+keypadPlus = 'resize smart +70'
+h = ['resize width -64']
+j = ['resize height -64']
+k = ['resize height +64']
+l = ['resize width +64']
+esc = [
+  'mode main',
+  'exec-and-forget sketchybar --trigger hide_message'
+]
+enter = [
+  'mode main',
+  'exec-and-forget sketchybar --trigger hide_message'
+]
+
+[mode.join.binding]
+h = ['join-with left', 'mode main']
+j = ['join-with down', 'mode main']
+k = ['join-with up', 'mode main']
+l = ['join-with right', 'mode main']
+
+[[on-window-detected]]
+if.app-id = 'org.alacritty'
+run = ['move-node-to-workspace 2']
+
+[[on-window-detected]]
+if.app-id = 'com.google.Chrome'
+run = ['move-node-to-workspace 3']
+
+[[on-window-detected]]
+if.app-id = 'com.todesktop.230313mzl4w4u92' # Cursor
+run = ['move-node-to-workspace 4']
+
+[[on-window-detected]]
+if.app-id = 'com.spotify.client'
+run = ['move-node-to-workspace 7']
+
+[[on-window-detected]]
+if.app-id = 'com.tinyspeck.slackmacgap'
+run = ['move-node-to-workspace 8']
+
+[[on-window-detected]]
+if.app-id = 'com.microsoft.Outlook'
+run = ['move-node-to-workspace 9']
+
+[[on-window-detected]]
+if.app-id = 'com.microsoft.teams2'
+run = ['move-node-to-workspace 10']
+
+# [[on-window-detected]]
+# if.app-id = 'com.apple.finder'
+# run = ['layout floating']

@@ -4,6 +4,9 @@
 # Fetched by scripts/fetch-plugins.sh, never tracked
 tmux/.config/tmux/plugins/
 zsh/.config/zsh/plugins/
+# Built by scripts/build-swift-tools.sh from the .swift sources next to them
+aerospace/.config/aerospace/cheatsheet
+sketchybar/.config/sketchybar/pomodoro/pomodoro-panel
 # Machine-local state and overrides
 zsh/.config/zsh/.zsh_history
 *.local

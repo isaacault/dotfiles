@@ -25,8 +25,13 @@ grep -q isaac.ault@gmail.com "$H1/.gitconfig" || fail "personal email not set"
 if [ "$(uname)" = "Linux" ]; then
   [ -f "$H1/.config/sway/config" ]            || fail "sway missing (--gui)"
   [ -x "$H1/.config/waybar/mediaplayer.sh" ]  || fail "waybar script not executable"
+  [ ! -e "$H1/.config/aerospace" ]            || fail "aerospace linked on Linux"
+  [ ! -e "$H1/.config/sketchybar" ]           || fail "sketchybar linked on Linux"
 else
   [ ! -e "$H1/.config/sway" ]                 || fail "sway linked on non-Linux"
+  [ -f "$H1/.config/aerospace/aerospace.toml" ]  || fail "aerospace missing (--gui)"
+  [ -f "$H1/.config/sketchybar/sketchybarrc" ]   || fail "sketchybar missing (--gui)"
+  [ ! -e "$SRC/aerospace/.config/aerospace/cheatsheet" ] || fail "built binary leaked into the repo"
 fi
 [ ! -e "$H1/README.md" ]                      || fail "README leaked"
 [ ! -e "$H1/docs" ]                           || fail "docs leaked"
@@ -51,6 +56,8 @@ HOME="$H2" "$SRC/install.sh"
 [ -f "$H2/.config/nvim/init.lua" ]            || fail "nvim missing"
 [ ! -e "$H2/.config/sway" ]                   || fail "sway linked without --gui"
 [ ! -e "$H2/.config/alacritty" ]              || fail "alacritty linked without --gui"
+[ ! -e "$H2/.config/aerospace" ]              || fail "aerospace linked without --gui"
+[ ! -e "$H2/.config/sketchybar" ]             || fail "sketchybar linked without --gui"
 rm -rf "$H2"
 echo "case 2 (core only) OK"
 

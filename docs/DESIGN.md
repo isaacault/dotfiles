@@ -83,7 +83,10 @@ separate private repo. Config only, never state/credentials (`~/.claude.json`,
 sessions, history, etc. stay out), and never the work-internal,
 externally-managed `skills/`.
 
-## Still planned
+## macOS GUI
 
-- **aerospace**: add `aerospace/.config/aerospace/aerospace.toml` from the Mac,
-  and add `aerospace` to the macOS GUI packages in `install.sh`.
+`aerospace` and `sketchybar` are macOS-only packages, linked by `--gui`. Two
+small Swift helpers (aerospace's cheat sheet, sketchybar's pomodoro panel) are
+committed as source only; `scripts/build-swift-tools.sh` compiles them into the
+live config dirs. Build output is gitignored, never tracked. Backup copies and
+runtime state (`*.bak`, pomodoro logs under `~/.local/state`) stay out.

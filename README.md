@@ -17,7 +17,9 @@ nvim/.config/nvim/
 tmux/.config/tmux/
 starship/.config/starship.toml
 claude/.claude/keybindings.json
-alacritty/, sway/, swaync/, waybar/      GUI packages
+alacritty/                               GUI package (both OSes)
+sway/, swaync/, waybar/                  GUI packages (Linux)
+aerospace/, sketchybar/                  GUI packages (macOS)
 ```
 
 `stow nvim` makes `~/.config/nvim/...` symlinks into `nvim/.config/nvim/...`.
@@ -37,7 +39,12 @@ scripts/fetch-plugins.sh                   # pinned tmux + zsh plugins
 Stow refuses to overwrite an existing real file. If `./install.sh` reports a
 conflict, diff the existing file against the repo and move one aside.
 
-`--gui` adds alacritty, plus sway/swaync/waybar on Linux. Packages can also be
+`--gui` adds alacritty, plus sway/swaync/waybar on Linux or aerospace/sketchybar
+on macOS. On macOS also run `scripts/build-swift-tools.sh` once: it compiles
+the aerospace cheat sheet and the sketchybar pomodoro panel from the Swift
+sources (the binaries are gitignored build output). aerospace and sketchybar
+themselves come from Homebrew; sketchybar's Lua module (SbarLua) is installed
+separately into `~/.local/share/sketchybar_lua`. Packages can also be
 linked individually: `stow --no-folding -t ~ nvim`. `--no-folding` matters:
 it stops stow linking whole directories, which would let fetched plugins
 land inside this repo.
@@ -49,7 +56,7 @@ land inside this repo.
 - **nvim**: full lazy.nvim config, `lazy-lock.json` pins plugins
 - **git**: shared identity; `~/.gitconfig.local` for machine-local extras
 - **Claude Code**: `keybindings.json` only; `CLAUDE.md`, `settings.json` and skills live in a separate private repo
-- **GUI (optional)**: sway, swaync, waybar, alacritty
+- **GUI (optional)**: sway, swaync, waybar, alacritty, aerospace, sketchybar
 - **work (optional)**: a private overlay repo owns all work-specific config; see below
 
 ## Git identity
