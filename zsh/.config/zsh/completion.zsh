@@ -14,7 +14,22 @@ bindkey -M menuselect 'l' vi-forward-char
 # Escape menu on esc
 bindkey -M menuselect '^[' undo
 
-autoload -Uz compinit; compinit
+autoload -Uz compinit
+() {
+  setopt local_options extended_glob
+  local dump=$ZDOTDIR/.zcompdump
+  # Full rebuild plus security audit at most once a day; otherwise trust the
+  # cache (-C). A just-installed completion can take up to a day to appear:
+  # `rm $ZDOTDIR/.zcompdump*` and open a new shell to force it.
+  if [[ -n $dump(#qN.mh-24) ]]; then
+    compinit -C -d $dump
+  else
+    compinit -d $dump
+    # compinit leaves a still-valid cache untouched, so reset its age here or
+    # every later shell would repeat the full audit
+    touch $dump
+  fi
+}
 _comp_options+=(globdots) # With hidden files
 
 setopt MENU_COMPLETE        # Automatically highlight first element of completion menu
