@@ -11,7 +11,6 @@ Files inside sit at the path they have under `$HOME`.
 
 ```
 bash/.bashrc, .profile
-zsh/.zshenv, .config/zsh/
 git/.gitconfig, .config/git/
 nvim/.config/nvim/
 tmux/.config/tmux/
@@ -30,8 +29,8 @@ Edit either path; `git status` here shows the change.
 ```sh
 git clone https://github.com/isaacault/dotfiles ~/dotfiles
 cd ~/dotfiles
-scripts/install-packages.sh [--devtools]   # stow, git, tmux, zsh, nvim, starship, claude
-scripts/fetch-plugins.sh                   # pinned tmux + zsh plugins
+scripts/install-packages.sh [--devtools]   # stow, git, tmux, nvim, starship, claude (+ bash on macOS)
+scripts/fetch-plugins.sh                   # pinned tmux plugins
 ./install.sh -n                            # dry run: what would be linked
 ./install.sh [--gui]                       # link it
 ```
@@ -51,7 +50,7 @@ land inside this repo.
 
 ## What's managed
 
-- **shell**: `bash` (starship prompt) and `zsh` (pure prompt, `ZDOTDIR=~/.config/zsh`)
+- **shell**: `bash` everywhere, starship prompt. On macOS the login shell is Homebrew's bash (`install-packages.sh` prints the `chsh` steps)
 - **tmux**: `~/.config/tmux/tmux.conf`; plugins fetched by `scripts/fetch-plugins.sh` (pinned tpm, catppuccin, resurrect, continuum)
 - **nvim**: full lazy.nvim config, `lazy-lock.json` pins plugins
 - **git**: shared identity; `~/.gitconfig.local` for machine-local extras
@@ -90,6 +89,18 @@ Machines set up before this repo used non-standard XDG paths
 ```sh
 scripts/migrate-xdg.sh
 ```
+
+Machines that had the old `zsh` package linked: unlink it **before** pulling
+the commit that removed it (stow needs the package files to undo the links),
+then switch the login shell to bash (`scripts/install-packages.sh` prints how):
+
+```sh
+stow -D --no-folding -d ~/dotfiles -t ~ zsh
+git -C ~/dotfiles pull && ~/dotfiles/install.sh
+```
+
+Already pulled? `find ~ ~/.config/zsh -maxdepth 1 -xtype l` lists the
+dangling links left behind.
 
 ## Secrets policy
 

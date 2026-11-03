@@ -27,7 +27,7 @@ done
 
 command -v stow >/dev/null 2>&1 || { echo "stow not found (brew/apt/dnf install stow)" >&2; exit 1; }
 
-pkgs=(bash zsh git nvim tmux starship claude)
+pkgs=(bash git nvim tmux starship claude)
 if [ "$gui" -eq 1 ]; then
   pkgs+=(alacritty)
   [ "$(uname)" = "Linux" ] && pkgs+=(sway swaync waybar)

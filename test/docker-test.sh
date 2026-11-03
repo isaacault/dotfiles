@@ -19,8 +19,6 @@ docker run --rm -v "$SRC:/dotfiles:ro" ubuntu:24.04 bash -euo pipefail -c '
 
     # core
     test -f \$HOME/.bashrc
-    test -f \$HOME/.zshenv
-    test -f \$HOME/.config/zsh/.zshrc
     test -f \$HOME/.config/tmux/tmux.conf
     test -f \$HOME/.config/nvim/init.lua
     test -f \$HOME/.config/starship.toml
@@ -29,7 +27,6 @@ docker run --rm -v "$SRC:/dotfiles:ro" ubuntu:24.04 bash -euo pipefail -c '
     # plugins fetched (pinned archives)
     test -f \$HOME/.config/tmux/plugins/tpm/tpm
     test -f \$HOME/.config/tmux/plugins/tmux/catppuccin.tmux
-    test -d \$HOME/.config/zsh/plugins/pure
 
     # gui module present
     test -f \$HOME/.config/sway/config

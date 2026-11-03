@@ -74,21 +74,44 @@ fi
 
 # --- personal (https://github.com/isaacault/dotfiles) ---
 
+# macOS: silence Apple's "default shell is now zsh" notice, and set up Homebrew
+# without forking `brew shellenv`: it spawns subprocesses, and each launch is
+# intercepted by endpoint security, which made new terminals slow. Mirrors its
+# output; compare after a brew upgrade with:
+#   env -i HOME=$HOME /opt/homebrew/bin/brew shellenv
+# Must come before the fzf and starship checks below, which need brew's PATH.
+if [[ $OSTYPE == darwin* ]]; then
+  export BASH_SILENCE_DEPRECATION_WARNING=1
+  if [ -x /opt/homebrew/bin/brew ]; then
+    export HOMEBREW_PREFIX=/opt/homebrew HOMEBREW_CELLAR=/opt/homebrew/Cellar HOMEBREW_REPOSITORY=/opt/homebrew
+    case ":$PATH:" in
+      *":$HOMEBREW_PREFIX/bin:"*) ;;
+      *) export PATH="$HOMEBREW_PREFIX/bin:$HOMEBREW_PREFIX/sbin:$PATH" ;;
+    esac
+    case ":${INFOPATH:-}:" in
+      *":$HOMEBREW_PREFIX/share/info:"*) ;;
+      *) export INFOPATH="$HOMEBREW_PREFIX/share/info:${INFOPATH:-}" ;;
+    esac
+    # bash-completion@2 (needs bash >= 4.2; its loader skips older bash)
+    [ -r "$HOMEBREW_PREFIX/etc/profile.d/bash_completion.sh" ] && . "$HOMEBREW_PREFIX/etc/profile.d/bash_completion.sh"
+  fi
+fi
+
 export EDITOR=nvim
 export VISUAL=nvim
 alias vim='nvim'
 alias vi='nvim'
 alias vimdiff='nvim -d'
 
-# history: match the zsh config's depth + dup suppression (overrides stock above)
+# history: deeper, with dup suppression (overrides stock above)
 HISTSIZE=10000
 HISTFILESIZE=10000
 HISTCONTROL=ignoreboth:erasedups
 
-# vi mode (parity with zsh `bindkey -v`; `v` in command mode edits the line in nvim)
+# vi mode (`v` in command mode edits the line in nvim)
 set -o vi
 
-# completion QoL (parity with zsh completion.zsh, within readline's limits)
+# completion QoL
 bind 'set completion-ignore-case on'
 bind 'set show-all-if-ambiguous on'
 bind 'set colored-stats on'
@@ -101,7 +124,7 @@ case ":$PATH:" in
 esac
 [ -d /opt/nvim-linux-x86_64/bin ] && export PATH="$PATH:/opt/nvim-linux-x86_64/bin"
 
-# fzf: Ctrl-R fuzzy history, Ctrl-T file picker (parity with zsh `fzf --zsh`)
+# fzf: Ctrl-R fuzzy history, Ctrl-T file picker
 if command -v fzf >/dev/null 2>&1; then
   if fzf --bash >/dev/null 2>&1; then
     eval "$(fzf --bash)"

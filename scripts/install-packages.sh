@@ -10,7 +10,7 @@ devtools=0
 
 if [ "$(uname)" = "Darwin" ]; then
   command -v brew >/dev/null 2>&1 || { echo "Homebrew required first: https://brew.sh" >&2; exit 1; }
-  brew install stow git tmux zsh fzf ripgrep fd jq neovim starship
+  brew install stow git tmux bash bash-completion@2 fzf ripgrep fd jq neovim starship
   [ "$devtools" -eq 1 ] && brew install bat eza zoxide uv glab node
 else
   SUDO=""
@@ -18,13 +18,13 @@ else
 
   if command -v apt-get >/dev/null 2>&1; then
     $SUDO apt-get update -qq
-    $SUDO apt-get install -y -qq stow git curl tmux zsh fzf ripgrep fd-find xclip jq build-essential
+    $SUDO apt-get install -y -qq stow git curl tmux fzf ripgrep fd-find xclip jq build-essential
     [ "$devtools" -eq 1 ] && $SUDO apt-get install -y -qq bat eza nodejs npm
   elif command -v dnf >/dev/null 2>&1; then
-    $SUDO dnf install -y -q stow git curl tmux zsh fzf ripgrep fd-find xclip jq gcc gcc-c++ make
+    $SUDO dnf install -y -q stow git curl tmux fzf ripgrep fd-find xclip jq gcc gcc-c++ make
     [ "$devtools" -eq 1 ] && $SUDO dnf install -y -q bat eza nodejs npm
   else
-    echo "No supported package manager (apt/dnf): install stow, git, tmux, zsh, fzf, ripgrep, fd, jq manually" >&2
+    echo "No supported package manager (apt/dnf): install stow, git, tmux, fzf, ripgrep, fd, jq manually" >&2
   fi
 
   mkdir -p "$HOME/.local/bin" "$HOME/.local/opt"
@@ -36,7 +36,7 @@ else
     ln -sf "$HOME/.local/opt/nvim-linux-x86_64/bin/nvim" "$HOME/.local/bin/nvim"
   fi
 
-  # starship prompt (bash uses it; zsh uses pure)
+  # starship prompt
   if ! command -v starship >/dev/null 2>&1; then
     curl -fsSL https://starship.rs/install.sh | sh -s -- -y -b "$HOME/.local/bin"
   fi
@@ -57,4 +57,19 @@ fi
 # ~/.local/bin/claude. The -x test keeps this idempotent before PATH reloads.
 if ! command -v claude >/dev/null 2>&1 && [ ! -x "$HOME/.local/bin/claude" ]; then
   curl -fsSL https://claude.ai/install.sh | bash
+fi
+
+# bash is the shell everywhere. macOS ships bash 3.2, so make Homebrew's the
+# login shell; changing /etc/shells needs sudo, so print the steps instead.
+if [ "$(uname)" = "Darwin" ]; then
+  want="$(brew --prefix)/bin/bash"
+  [ "${SHELL:-}" = "$want" ] && want=""
+else
+  want="/bin/bash"
+  case "${SHELL:-}" in */bash) want="" ;; esac
+fi
+if [ -n "$want" ]; then
+  echo "Login shell is ${SHELL:-unset}. To switch to bash:"
+  grep -qxF "$want" /etc/shells || echo "  echo $want | sudo tee -a /etc/shells"
+  echo "  chsh -s $want"
 fi

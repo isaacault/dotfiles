@@ -14,8 +14,6 @@ H1="$(mktemp -d)"
 HOME="$H1" "$SRC/install.sh" --gui
 
 [ -L "$H1/.bashrc" ]                          || fail "bashrc not linked"
-[ -f "$H1/.zshenv" ]                          || fail "zshenv missing"
-[ -f "$H1/.config/zsh/.zshrc" ]               || fail "zshrc missing"
 [ -f "$H1/.config/tmux/tmux.conf" ]           || fail "tmux.conf missing"
 [ -f "$H1/.config/nvim/init.lua" ]            || fail "nvim missing"
 [ -f "$H1/.config/starship.toml" ]            || fail "starship missing"
@@ -39,13 +37,12 @@ fi
 # plugins must land in $HOME, never inside the repo (needs --no-folding)
 HOME="$H1" XDG_CONFIG_HOME="$H1/.config" "$SRC/scripts/fetch-plugins.sh"
 [ -f "$H1/.config/tmux/plugins/tpm/tpm" ]     || fail "plugin tpm not fetched"
-[ -d "$H1/.config/zsh/plugins/pure" ]         || fail "plugin pure not fetched"
 [ ! -e "$SRC/tmux/.config/tmux/plugins" ]     || fail "plugins leaked into the repo"
 
 # re-running must be a no-op, not an error
 HOME="$H1" "$SRC/install.sh" --gui
 
-! grep -qrE '(nvapi-|glpat-|ghp_)' "$H1/.bashrc" "$H1/.gitconfig" "$H1/.config/zsh/" \
+! grep -qrE '(nvapi-|glpat-|ghp_)' "$H1/.bashrc" "$H1/.gitconfig" \
                                               || fail "secret pattern in linked home"
 rm -rf "$H1"
 echo "case 1 (core+gui) OK"

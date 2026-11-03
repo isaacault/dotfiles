@@ -36,8 +36,11 @@ configs; none of the managed ones do), and no per-machine file generation.
    `.gitignore` excludes `*.local` and `*.work` as a safety net.
 4. **Provisioning is opt-in.** `install.sh` only links; packages install only
    when `scripts/install-packages.sh` is run. Keeps work/ssh boxes config-only.
-5. **bash on work boxes (starship), zsh on personal (pure)**: both managed
-   everywhere; login shell choice stays per-machine.
+5. **bash everywhere, starship prompt.** zsh + pure was dropped on
+   2026-11-03: the bash config already matched it (vi mode, fzf, completion
+   tweaks, history), and one shell means one config. Given up: syntax
+   highlighting and zsh's menu completion. macOS ships bash 3.2, so
+   Homebrew's bash is the login shell there.
 6. **Git identity is layered**: the committed default is the personal email; a
    work machine overrides it in `~/.gitconfig.local`; `isaacault/*` GitHub
    remotes are forced back to the personal email via `includeIf hasconfig`,
@@ -57,7 +60,6 @@ configs; none of the managed ones do), and no per-machine file generation.
 
 ## Layout notes
 
-- zsh is XDG-first: `~/.zshenv` only bootstraps `ZDOTDIR=~/.config/zsh`.
 - tmux config is `~/.config/tmux/tmux.conf` (tmux >= 3.1); the legacy
   `~/.tmux.conf` symlink was retired.
 - `alacritty.yml` (deprecated) was dropped; `alacritty.toml` kept.
