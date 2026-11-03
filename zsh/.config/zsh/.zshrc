@@ -50,9 +50,13 @@ bindkey -M vicmd v edit-command-line
 if (( $+commands[fzf] )); then
   _fzf_cache=${XDG_CACHE_HOME:-$HOME/.cache}/zsh/fzf.zsh
   if [[ ! -s $_fzf_cache || $commands[fzf] -nt $_fzf_cache ]]; then
-    mkdir -p ${_fzf_cache:h} && fzf --zsh >| $_fzf_cache
+    mkdir -p ${_fzf_cache:h}
+    # fzf < 0.48 (Ubuntu 24.04 ships 0.44) has no --zsh; fall back to the
+    # scripts the Debian/Ubuntu package installs.
+    fzf --zsh >| $_fzf_cache 2>/dev/null ||
+      cat /usr/share/doc/fzf/examples/{key-bindings,completion}.zsh >| $_fzf_cache 2>/dev/null
   fi
-  source $_fzf_cache
+  [[ -s $_fzf_cache ]] && source $_fzf_cache
   unset _fzf_cache
 fi
 
