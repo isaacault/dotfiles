@@ -18,7 +18,7 @@ starship/.config/starship.toml
 claude/.claude/keybindings.json
 alacritty/                               GUI package (both OSes)
 sway/, swaync/, waybar/                  GUI packages (Linux)
-aerospace/, sketchybar/, karabiner/      GUI packages (macOS)
+aerospace/, sketchybar/                  GUI packages (macOS)
 ```
 
 `stow nvim` makes `~/.config/nvim/...` symlinks into `nvim/.config/nvim/...`.
@@ -49,6 +49,9 @@ linked individually: `stow --no-folding -t ~ nvim`. `--no-folding` matters:
 it stops stow linking whole directories, which would let fetched plugins
 land inside this repo.
 
+On macOS, Caps Lock -> Control is a system setting, not a file: System Settings >
+Keyboard > Keyboard Shortcuts > Modifier Keys.
+
 ## Package lists
 
 What `scripts/install-packages.sh` installs is kept in `packages/`, one list per
@@ -73,7 +76,7 @@ distro versions lag. To see what a Brewfile would still install on a Mac:
 - **nvim**: full lazy.nvim config, `lazy-lock.json` pins plugins
 - **git**: shared identity; `~/.gitconfig.local` for machine-local extras
 - **Claude Code**: `keybindings.json` only; `CLAUDE.md`, `settings.json` and skills live in a separate private repo
-- **GUI (optional)**: sway, swaync, waybar, alacritty, aerospace, sketchybar, karabiner
+- **GUI (optional)**: sway, swaync, waybar, alacritty, aerospace, sketchybar
 - **work (optional)**: a private overlay repo owns all work-specific config; see below
 
 ## Git identity

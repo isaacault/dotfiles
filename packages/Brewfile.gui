@@ -6,7 +6,6 @@ tap "nikitabobko/tap"       # aerospace
 
 cask "alacritty"
 cask "aerospace"
-cask "karabiner-elements"   # caps lock -> control (also an optional, disabled ctrl-c/v rule)
 
 brew "sketchybar"
 brew "lua"                  # SbarLua, which sketchybar's Lua config loads

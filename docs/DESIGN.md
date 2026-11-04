@@ -87,14 +87,11 @@ externally-managed `skills/`.
 
 ## macOS GUI
 
-`aerospace`, `sketchybar` and `karabiner` are macOS-only packages, linked by
-`--gui`. `karabiner` is one file, `karabiner.json` (caps lock -> control; a
-ctrl-c/v rule is included but disabled). Karabiner-Elements may replace a
-symlinked `karabiner.json` with a plain file when you save from its GUI, so
-make changes in the repo file. It also pins `keyboard_type_v2` (`iso`) for the
-virtual keyboard, which is hardware specific: adjust it on an ANSI keyboard.
-Karabiner's `assets/` and `automatic_backups/` stay local, because stow links
-files, not the directory. Two
+`aerospace` and `sketchybar` are macOS-only packages, linked by `--gui`.
+Caps Lock -> Control is a macOS setting (System Settings > Keyboard > Keyboard
+Shortcuts > Modifier Keys), not a file in the repo. Karabiner-Elements was tried
+for it and dropped: it needs Login Items and Input Monitoring permissions, and
+one remap does not justify the extra moving parts. Two
 small Swift helpers (aerospace's cheat sheet, sketchybar's pomodoro panel) are
 committed as source only; `scripts/build-swift-tools.sh` compiles them into the
 live config dirs. Build output is gitignored, never tracked. Backup copies and
