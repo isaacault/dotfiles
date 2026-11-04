@@ -75,9 +75,9 @@ rm -rf "$H3" "$OVR"
 echo "case 3 (work overlay) OK"
 
 # --- case 4: package manifests ---
-for f in apt apt-devtools dnf dnf-devtools; do
+for f in apt apt-devtools apt-gui dnf dnf-devtools dnf-gui; do
   [ -s "$SRC/packages/$f.txt" ]               || fail "packages/$f.txt missing or empty"
-  bad="$(grep -v -E '^[[:space:]]*(#|$)' "$SRC/packages/$f.txt" | grep -v -E '^[a-z0-9][a-z0-9+._-]*$' || true)"
+  bad="$(grep -v -E '^[[:space:]]*(#|$)' "$SRC/packages/$f.txt" | grep -v -E '^[A-Za-z0-9][A-Za-z0-9+._-]*$' || true)"
   [ -z "$bad" ]                               || fail "packages/$f.txt has non-package lines: $bad"
 done
 for f in Brewfile Brewfile.gui Brewfile.devtools Brewfile.extras; do

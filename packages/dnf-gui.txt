@@ -1,0 +1,35 @@
+# GUI packages for Fedora (install-packages.sh --gui): sway, waybar, swaync,
+# alacritty and what their configs call. One per line; blank lines and #
+# comments ignored. Names checked against the Fedora rawhide package metadata.
+sway
+swaybg
+swayidle
+swaylock
+waybar
+# Fedora's name for swaync
+SwayNotificationCenter
+alacritty
+# $menu in the sway config is dmenu
+dmenu
+wl-clipboard
+# screenshot mode: grim, slurp, swappy
+grim
+slurp
+swappy
+brightnessctl
+playerctl
+pavucontrol
+# pactl, used by the volume keys
+pulseaudio-utils
+pipewire-pulseaudio
+wireplumber
+xdg-desktop-portal-wlr
+xdg-desktop-portal-gtk
+# renders the SVG wallpaper
+librsvg2
+fontawesome-fonts-all
+network-manager-applet
+# polkit agent; start it from the sway config (the lxpolkit line there is commented out)
+mate-polkit
+# Nerd Fonts (JetBrainsMono, Ubuntu, NotoSansMono) are not packaged; download
+# them into ~/.local/share/fonts and run fc-cache. No script for that yet.

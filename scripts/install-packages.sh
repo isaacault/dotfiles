@@ -6,7 +6,7 @@
 #   always      packages/Brewfile           packages/{apt,dnf}.txt
 #   --devtools  packages/Brewfile.devtools  packages/{apt,dnf}-devtools.txt
 #               (eza, bat, zoxide, uv, glab, node)
-#   --gui       packages/Brewfile.gui       macOS only
+#   --gui       packages/Brewfile.gui       packages/{apt,dnf}-gui.txt
 #   --extras    packages/Brewfile.extras    macOS only: personal, not needed by the configs
 set -euo pipefail
 
@@ -36,7 +36,7 @@ if [ "$(uname)" = "Darwin" ]; then
   fi
   [ "$extras" -eq 1 ] && brew bundle --file="$ROOT/packages/Brewfile.extras"
 else
-  [ "$gui" -eq 1 ] || [ "$extras" -eq 1 ] && echo "note: --gui and --extras have no Linux package lists yet; ignoring" >&2
+  [ "$extras" -eq 1 ] && echo "note: --extras has no Linux package list; ignoring" >&2
 
   SUDO=""
   [ "$(id -u)" -ne 0 ] && SUDO="sudo"
@@ -45,9 +45,11 @@ else
     $SUDO apt-get update -qq
     pkgs apt.txt | xargs $SUDO apt-get install -y -qq
     [ "$devtools" -eq 1 ] && pkgs apt-devtools.txt | xargs $SUDO apt-get install -y -qq
+    [ "$gui" -eq 1 ] && pkgs apt-gui.txt | xargs $SUDO apt-get install -y -qq
   elif command -v dnf >/dev/null 2>&1; then
     pkgs dnf.txt | xargs $SUDO dnf install -y -q
     [ "$devtools" -eq 1 ] && pkgs dnf-devtools.txt | xargs $SUDO dnf install -y -q
+    [ "$gui" -eq 1 ] && pkgs dnf-gui.txt | xargs $SUDO dnf install -y -q
   else
     echo "No supported package manager (apt/dnf): install the packages in packages/apt.txt manually" >&2
   fi

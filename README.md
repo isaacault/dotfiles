@@ -38,7 +38,7 @@ scripts/fetch-plugins.sh                   # pinned tmux plugins
 Stow refuses to overwrite an existing real file. If `./install.sh` reports a
 conflict, diff the existing file against the repo and move one aside.
 
-`--gui` adds alacritty, plus sway/swaync/waybar on Linux or aerospace/sketchybar
+`--gui` adds alacritty, plus sway/swaync/waybar on Linux (installed from the `--gui` package lists) or aerospace/sketchybar
 on macOS. On macOS also run `scripts/build-swift-tools.sh` once: it compiles
 the aerospace cheat sheet and the sketchybar pomodoro panel from the Swift
 sources (the binaries are gitignored build output). aerospace and sketchybar
@@ -64,12 +64,14 @@ purpose, so the lists are the single place to edit:
 |---|---|---|
 | always | `Brewfile` | `apt.txt` / `dnf.txt` |
 | `--devtools` | `Brewfile.devtools` | `apt-devtools.txt` / `dnf-devtools.txt` |
-| `--gui` | `Brewfile.gui` | none yet |
+| `--gui` | `Brewfile.gui` | `apt-gui.txt` / `dnf-gui.txt` |
 | `--extras` | `Brewfile.extras` (personal, optional) | none |
 
 The `.txt` lists take one package per line; blank lines and `#` comments are
 ignored. neovim and starship come from their own installers on Linux, because
-distro versions lag. To see what a Brewfile would still install on a Mac:
+distro versions lag. The Linux GUI lists need Debian 13 / Ubuntu 24.04 or
+newer, or Fedora; Nerd Fonts are not packaged, so download them into
+`~/.local/share/fonts` yourself. To see what a Brewfile would still install on a Mac:
 `brew bundle check --no-upgrade --verbose --file=packages/Brewfile.gui`.
 
 ## What's managed
