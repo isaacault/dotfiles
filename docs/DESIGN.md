@@ -80,7 +80,9 @@ re-run it once access is sorted. The key itself must be registered first.
 
 ## Claude Code
 
-`~/.claude/keybindings.json` only. `CLAUDE.md` and `settings.json` live in a
+`~/.claude/keybindings.json` and `~/.claude/statusline.py`. The script is
+linked, but `settings.json` (which turns it on) is not, so each machine opts in
+with one `statusLine` entry. `CLAUDE.md` and `settings.json` live in a
 separate private repo. Config only, never state/credentials (`~/.claude.json`,
 sessions, history, etc. stay out), and never the work-internal,
 externally-managed `skills/`.

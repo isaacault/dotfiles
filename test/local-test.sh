@@ -20,6 +20,7 @@ HOME="$H1" "$SRC/install.sh" --gui
 [ -f "$H1/.config/alacritty/alacritty.toml" ] || fail "alacritty missing (--gui)"
 grep -q isaac.ault@gmail.com "$H1/.gitconfig" || fail "personal email not set"
 [ -f "$H1/.claude/keybindings.json" ]         || fail "claude keybindings missing"
+[ -x "$H1/.claude/statusline.py" ]            || fail "claude statusline missing"
 if [ "$(uname)" = "Linux" ]; then
   [ -f "$H1/.config/sway/config" ]            || fail "sway missing (--gui)"
   [ -x "$H1/.config/waybar/mediaplayer.sh" ]  || fail "waybar script not executable"

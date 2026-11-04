@@ -15,7 +15,7 @@ git/.gitconfig, .config/git/
 nvim/.config/nvim/
 tmux/.config/tmux/
 starship/.config/starship.toml
-claude/.claude/keybindings.json
+claude/.claude/keybindings.json, statusline.py
 alacritty/                               GUI package (both OSes)
 sway/, swaync/, waybar/                  GUI packages (Linux)
 aerospace/, sketchybar/                  GUI packages (macOS)
@@ -75,7 +75,7 @@ distro versions lag. To see what a Brewfile would still install on a Mac:
 - **tmux**: `~/.config/tmux/tmux.conf`; plugins fetched by `scripts/fetch-plugins.sh` (pinned tpm, catppuccin, resurrect, continuum)
 - **nvim**: full lazy.nvim config, `lazy-lock.json` pins plugins
 - **git**: shared identity; `~/.gitconfig.local` for machine-local extras
-- **Claude Code**: `keybindings.json` only; `CLAUDE.md`, `settings.json` and skills live in a separate private repo
+- **Claude Code**: `keybindings.json` and a status-line script (`statusline.py`: model, context, cost, directory); `CLAUDE.md`, `settings.json` and skills live in a separate private repo. To use the status line, add to `~/.claude/settings.json`: `"statusLine": {"type": "command", "command": "python3 ~/.claude/statusline.py"}`
 - **GUI (optional)**: sway, swaync, waybar, alacritty, aerospace, sketchybar
 - **work (optional)**: a private overlay repo owns all work-specific config; see below
 
