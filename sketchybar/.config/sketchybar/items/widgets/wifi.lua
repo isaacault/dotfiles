@@ -26,8 +26,14 @@ local wifiBracket = sbar.add("bracket", constants.items.WIFI .. ".bracket", {
 
 -- Reads the network name with Location Services permission; macOS hides it from
 -- plain commands. Built by scripts/build-swift-tools.sh, see wifi-ssid/wifi-ssid.swift.
-local ssidHelper = (os.getenv("XDG_CONFIG_HOME") or (os.getenv("HOME") .. "/.config"))
-  .. "/sketchybar/wifi-ssid/wifi-ssid.app/Contents/MacOS/wifi-ssid"
+-- CoreWLAN checks the permission of the *responsible* process: run directly,
+-- the helper counts as sketchybar's and gets nothing, so it is launched through
+-- open(1), which makes the app its own responsible process, and its output is
+-- read back from a file.
+local ssidApp = (os.getenv("XDG_CONFIG_HOME") or (os.getenv("HOME") .. "/.config"))
+  .. "/sketchybar/wifi-ssid/wifi-ssid.app"
+local ssidCmd = "f=$(mktemp) && open -n -W -g --stdout \"$f\" --stderr /dev/null '"
+  .. ssidApp .. "' --args --no-prompt; cat \"$f\"; rm -f \"$f\""
 
 local ssid = sbar.add("item", {
   align = "center",
@@ -179,7 +185,7 @@ local function toggleDetails()
       local connected = result:gsub("%s+", "") ~= ""
       ssid:set({ label = connected and "Connected" or "Disconnected" })
       if not connected then return end
-      sbar.exec("'" .. ssidHelper .. "' 2>/dev/null", function(name)
+      sbar.exec(ssidCmd, function(name)
         name = name:gsub("%s+$", "")
         if name ~= "" then ssid:set({ label = name }) end
       end)

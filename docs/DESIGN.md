@@ -100,7 +100,9 @@ its Wi-Fi name reader) are committed as source only;
 output is gitignored, never tracked. The Wi-Fi reader is an `.app` bundle
 holding Location Services permission: since macOS 14.4 that is the only way
 any process gets the network name, so this one permission is accepted (the
-widget degrades to "Connected" without it). sketchybar's Lua
+widget degrades to "Connected" without it). The widget starts it through
+`open`, not directly: CoreWLAN checks the permission of the responsible
+process, and a child of sketchybar counts as sketchybar. sketchybar's Lua
 module (SbarLua) is built by `scripts/install-sbarlua.sh` (run from
 `install-packages.sh --gui`), pinned to the last commit that embeds Lua 5.4:
 the `.so` must match Homebrew's `lua`, and upstream HEAD now embeds 5.5. The
