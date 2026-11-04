@@ -7,8 +7,14 @@ return {
     build = "make install_jsregexp",
     config = function()
       local ls = require("luasnip")
-      vim.keymap.set({ "i", "s" }, "<Tab>", function() ls.jump(1) end, { silent = true })
-      vim.keymap.set({ "i", "s" }, "<S-Tab>", function() ls.jump(-1) end, { silent = true })
+      -- Only jump when a snippet is active; otherwise fall through to the
+      -- literal key so Tab still indents.
+      vim.keymap.set({ "i", "s" }, "<Tab>", function()
+        return ls.locally_jumpable(1) and "<Plug>luasnip-jump-next" or "<Tab>"
+      end, { silent = true, expr = true })
+      vim.keymap.set({ "i", "s" }, "<S-Tab>", function()
+        return ls.locally_jumpable(-1) and "<Plug>luasnip-jump-prev" or "<S-Tab>"
+      end, { silent = true, expr = true })
     end,
   },
 }
