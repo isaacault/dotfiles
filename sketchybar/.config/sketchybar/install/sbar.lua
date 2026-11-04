@@ -10,14 +10,10 @@ local function exists(file)
   return ok, err
 end
 
-local function isdir(path)
-  return exists(path .. "/")
-end
-
-if not isdir(sbarpath) then
-  os.execute(
-    'tmp=$(mktemp -d) && git clone --depth 1 https://github.com/FelixKratz/SbarLua.git "$tmp" && (cd "$tmp" && make install); rm -rf "$tmp"'
-  )
+-- SbarLua is built by scripts/install-sbarlua.sh (pinned to a Lua 5.4 build),
+-- never at bar start: an unpinned build can embed a Lua that doesn't match.
+if not exists(sbarpath .. "sketchybar.so") then
+  error("SbarLua is not installed: run scripts/install-sbarlua.sh from the dotfiles repo")
 end
 
 package.cpath = package.cpath .. ";" .. sbarpath .. "?.so"

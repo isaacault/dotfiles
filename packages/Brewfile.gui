@@ -15,5 +15,6 @@ cask "font-jetbrains-mono-nerd-font"   # alacritty and sketchybar
 cask "font-space-mono-nerd-font"       # sketchybar
 cask "font-sketchybar-app-font"        # app icons in the bar
 
-# Not installed by brew: SbarLua itself. sketchybar/install/sbar.lua expects it
-# in ~/.local/share/sketchybar_lua (build it from FelixKratz/SbarLua).
+# Not installed by brew: SbarLua itself. scripts/install-packages.sh --gui runs
+# scripts/install-sbarlua.sh, which builds a pinned SbarLua (Lua 5.4, matching
+# the brew lua above) into ~/.local/share/sketchybar_lua.

@@ -43,7 +43,10 @@ on macOS. On macOS also run `scripts/build-swift-tools.sh` once: it compiles
 the aerospace cheat sheet and the sketchybar pomodoro panel from the Swift
 sources (the binaries are gitignored build output). aerospace and sketchybar
 themselves come from `packages/Brewfile.gui`; sketchybar's Lua module (SbarLua)
-is not packaged and is installed separately into `~/.local/share/sketchybar_lua`.
+is not packaged: `scripts/install-packages.sh --gui` builds it with
+`scripts/install-sbarlua.sh` into `~/.local/share/sketchybar_lua`. The script pins
+a SbarLua commit that embeds Lua 5.4 to match Homebrew's `lua`, since upstream
+HEAD moved to Lua 5.5 (`--force` rebuilds).
 Packages can also be
 linked individually: `stow --no-folding -t ~ nvim`. `--no-folding` matters:
 it stops stow linking whole directories, which would let fetched plugins

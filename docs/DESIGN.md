@@ -96,5 +96,9 @@ for it and dropped: it needs Login Items and Input Monitoring permissions, and
 one remap does not justify the extra moving parts. Two
 small Swift helpers (aerospace's cheat sheet, sketchybar's pomodoro panel) are
 committed as source only; `scripts/build-swift-tools.sh` compiles them into the
-live config dirs. Build output is gitignored, never tracked. Backup copies and
+live config dirs. Build output is gitignored, never tracked. sketchybar's Lua
+module (SbarLua) is built by `scripts/install-sbarlua.sh` (run from
+`install-packages.sh --gui`), pinned to the last commit that embeds Lua 5.4:
+the `.so` must match Homebrew's `lua`, and upstream HEAD now embeds 5.5. The
+bar errors with a pointer to the script instead of building at start. Backup copies and
 runtime state (`*.bak`, pomodoro logs under `~/.local/state`) stay out.

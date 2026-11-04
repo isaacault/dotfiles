@@ -29,7 +29,11 @@ if [ "$(uname)" = "Darwin" ]; then
   command -v brew >/dev/null 2>&1 || { echo "Homebrew required first: https://brew.sh" >&2; exit 1; }
   brew bundle --file="$ROOT/packages/Brewfile"
   [ "$devtools" -eq 1 ] && brew bundle --file="$ROOT/packages/Brewfile.devtools"
-  [ "$gui" -eq 1 ] && brew bundle --file="$ROOT/packages/Brewfile.gui"
+  if [ "$gui" -eq 1 ]; then
+    brew bundle --file="$ROOT/packages/Brewfile.gui"
+    # sketchybar's Lua module is not a brew package; build the pinned version
+    "$ROOT/scripts/install-sbarlua.sh"
+  fi
   [ "$extras" -eq 1 ] && brew bundle --file="$ROOT/packages/Brewfile.extras"
 else
   [ "$gui" -eq 1 ] || [ "$extras" -eq 1 ] && echo "note: --gui and --extras have no Linux package lists yet; ignoring" >&2
