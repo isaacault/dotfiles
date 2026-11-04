@@ -24,6 +24,11 @@ local wifiBracket = sbar.add("bracket", constants.items.WIFI .. ".bracket", {
   popup = { align = "center" }
 })
 
+-- Reads the network name with Location Services permission; macOS hides it from
+-- plain commands. Built by scripts/build-swift-tools.sh, see wifi-ssid/wifi-ssid.swift.
+local ssidHelper = (os.getenv("XDG_CONFIG_HOME") or (os.getenv("HOME") .. "/.config"))
+  .. "/sketchybar/wifi-ssid/wifi-ssid.app/Contents/MacOS/wifi-ssid"
+
 local ssid = sbar.add("item", {
   align = "center",
   position = "popup." .. wifiBracket.name,
@@ -168,9 +173,16 @@ local function toggleDetails()
     sbar.exec("ipconfig getifaddr " .. wifiDevice, function(result)
       ip:set({ label = result })
     end)
-    -- macOS redacts the SSID from ipconfig, so show link state instead.
+    -- Link state first; the helper then replaces it with the network name.
+    -- Until the helper is built and allowed, the row keeps the link state.
     sbar.exec("ipconfig getifaddr " .. wifiDevice, function(result)
-      ssid:set({ label = result:gsub("%s+", "") ~= "" and "Connected" or "Disconnected" })
+      local connected = result:gsub("%s+", "") ~= ""
+      ssid:set({ label = connected and "Connected" or "Disconnected" })
+      if not connected then return end
+      sbar.exec("'" .. ssidHelper .. "' 2>/dev/null", function(name)
+        name = name:gsub("%s+$", "")
+        if name ~= "" then ssid:set({ label = name }) end
+      end)
     end)
     sbar.exec("networksetup -getinfo Wi-Fi | awk -F 'Router: ' '/^Router: / {print $2}'", function(result)
       router:set({ label = result })

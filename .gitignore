@@ -8,6 +8,7 @@ tmux/.config/tmux/plugins/
 # Built by scripts/build-swift-tools.sh from the .swift sources next to them
 aerospace/.config/aerospace/cheatsheet
 sketchybar/.config/sketchybar/pomodoro/pomodoro-panel
+sketchybar/.config/sketchybar/wifi-ssid/wifi-ssid.app/
 # Machine-local state and overrides
 *.local
 *.work

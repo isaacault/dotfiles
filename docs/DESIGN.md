@@ -93,10 +93,14 @@ externally-managed `skills/`.
 Caps Lock -> Control is a macOS setting (System Settings > Keyboard > Keyboard
 Shortcuts > Modifier Keys), not a file in the repo. Karabiner-Elements was tried
 for it and dropped: it needs Login Items and Input Monitoring permissions, and
-one remap does not justify the extra moving parts. Two
-small Swift helpers (aerospace's cheat sheet, sketchybar's pomodoro panel) are
-committed as source only; `scripts/build-swift-tools.sh` compiles them into the
-live config dirs. Build output is gitignored, never tracked. sketchybar's Lua
+one remap does not justify the extra moving parts. Three
+small Swift helpers (aerospace's cheat sheet, sketchybar's pomodoro panel and
+its Wi-Fi name reader) are committed as source only;
+`scripts/build-swift-tools.sh` compiles them into the live config dirs. Build
+output is gitignored, never tracked. The Wi-Fi reader is an `.app` bundle
+holding Location Services permission: since macOS 14.4 that is the only way
+any process gets the network name, so this one permission is accepted (the
+widget degrades to "Connected" without it). sketchybar's Lua
 module (SbarLua) is built by `scripts/install-sbarlua.sh` (run from
 `install-packages.sh --gui`), pinned to the last commit that embeds Lua 5.4:
 the `.so` must match Homebrew's `lua`, and upstream HEAD now embeds 5.5. The

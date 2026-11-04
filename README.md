@@ -40,8 +40,12 @@ conflict, diff the existing file against the repo and move one aside.
 
 `--gui` adds alacritty, plus sway/swaync/waybar on Linux (installed from the `--gui` package lists) or aerospace/sketchybar
 on macOS. On macOS also run `scripts/build-swift-tools.sh` once: it compiles
-the aerospace cheat sheet and the sketchybar pomodoro panel from the Swift
-sources (the binaries are gitignored build output). aerospace and sketchybar
+the aerospace cheat sheet, the sketchybar pomodoro panel and the Wi-Fi name
+helper from the Swift sources (the binaries are gitignored build output). The
+Wi-Fi helper needs Location Services once, because macOS hides the network
+name from command-line tools: `open ~/.config/sketchybar/wifi-ssid/wifi-ssid.app`
+and click Allow (repeat after a rebuild). Without it the widget shows
+"Connected" instead of the name. aerospace and sketchybar
 themselves come from `packages/Brewfile.gui`; sketchybar's Lua module (SbarLua)
 is not packaged: `scripts/install-packages.sh --gui` builds it with
 `scripts/install-sbarlua.sh` into `~/.local/share/sketchybar_lua`. The script pins
