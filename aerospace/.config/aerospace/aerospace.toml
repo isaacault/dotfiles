@@ -42,7 +42,6 @@ default-root-container-orientation = 'auto'
 key-mapping.preset = 'qwerty'
 
 [gaps]
-#outer.bottom numbers have to match presentation.sh variables. built-in retina display is excluded from presentation mode, so this only works on external monitors.
 outer.bottom =        [{monitor.'^built-in retina display$' = 0 }, 5]
 outer.top =        [{monitor.'^built-in retina display$' = 15 }, 46]
 outer.left =       0
@@ -165,19 +164,6 @@ s = [
    'exec-and-forget sketchybar --trigger hide_message',
    'mode main'
 ] 
-
-b = [
-   'exec-and-forget ~/.config/aerospace/presentation.sh on',
-   'exec-and-forget sketchybar --bar height=0',
-   'exec-and-forget sketchybar --trigger hide_message',
-   'mode main'
-]
-shift-b = [
-   'exec-and-forget ~/.config/aerospace/presentation.sh off',
-   'exec-and-forget sketchybar --bar height=36',
-   'exec-and-forget sketchybar --trigger hide_message',
-   'mode main'
-]
 
 slash = ['exec-and-forget ~/.config/aerospace/cheatsheet', 'mode main', 'exec-and-forget sketchybar --trigger hide_message']
 f = ['layout floating tiling', 'exec-and-forget sketchybar --trigger hide_message', 'mode main'] # toggle floating for the focused window
