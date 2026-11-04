@@ -1,4 +1,4 @@
-local sbarpath = "/Users/" .. os.getenv("USER") .. "/.local/share/sketchybar_lua/"
+local sbarpath = os.getenv("HOME") .. "/.local/share/sketchybar_lua/"
 
 local function exists(file)
   local ok, err, code = os.rename(file, file)
@@ -16,7 +16,7 @@ end
 
 if not isdir(sbarpath) then
   os.execute(
-    "git clone https://github.com/FelixKratz/SbarLua.git /tmp/SbarLua && cd /tmp/SbarLua && make install && rm -rf /tmp/SbarLua/"
+    'tmp=$(mktemp -d) && git clone --depth 1 https://github.com/FelixKratz/SbarLua.git "$tmp" && (cd "$tmp" && make install); rm -rf "$tmp"'
   )
 end
 

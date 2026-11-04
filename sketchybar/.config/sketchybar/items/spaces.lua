@@ -1,7 +1,13 @@
 local constants = require("constants")
 local settings = require("config.settings")
+local hover = require("util.hover")
 
 local spaces = {}
+
+local spaceHover = hover.group(
+  { background = { height = settings.dimens.graphics.bar.height } },
+  { background = { height = settings.dimens.graphics.background.height } }
+)
 
 local swapWatcher = sbar.add("item", {
   drawing = false,
@@ -49,7 +55,6 @@ local function selectCurrentWorkspace(focusedWorkspaceName)
     end
   end
 
-  sbar.trigger(constants.events.UPDATE_WINDOWS)
 end
 
 local function findAndSelectCurrentWorkspace()
@@ -78,28 +83,7 @@ local function addWorkspaceItem(workspaceName)
     click_script = "aerospace workspace " .. workspaceName,
   })
 
-  spaces[spaceName]:subscribe("mouse.entered", function(env)
-    sbar.animate("tanh", 3, function()
-      spaces[spaceName]:set(
-        {
-          background = {
-            height = settings.dimens.graphics.bar.height,
-          }
-        }
-      )
-    end)
-  end)
-
-  spaces[spaceName]:subscribe("mouse.exited", function(env)
-    sbar.animate("tanh", 3, function()
-      spaces[spaceName]:set(
-        {
-          background = {
-            height = settings.dimens.graphics.background.height,
-          }
-        })
-    end)
-  end)
+  spaceHover.add(spaces[spaceName])
 
   sbar.add("item", spaceName .. ".padding", {
     width = settings.dimens.padding.label
@@ -123,7 +107,6 @@ end)
 
 currentWorkspaceWatcher:subscribe(constants.events.AEROSPACE_WORKSPACE_CHANGED, function(env)
   selectCurrentWorkspace(env.FOCUSED_WORKSPACE)
-  sbar.trigger(constants.events.UPDATE_WINDOWS)
 end)
 
 createWorkspaces()

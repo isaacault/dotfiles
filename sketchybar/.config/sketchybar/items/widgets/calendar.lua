@@ -1,4 +1,5 @@
 local constants = require("constants")
+local hover = require("util.hover")
 
 local calendar = sbar.add("item", constants.items.CALENDAR, {
   position = "right",
@@ -15,7 +16,17 @@ calendar:subscribe({ "forced", "routine", "system_woke" }, function(env)
   })
 end)
 
+local OPEN_OUTLOOK_CALENDAR <const> = table.concat({
+  "osascript",
+  [[-e 'tell application "Microsoft Outlook"']],
+  "-e 'activate'",
+  "-e 'set theWindow to first main window'",
+  "-e 'set the view of theWindow to calendar view'",
+  "-e 'end tell'",
+}, " ")
+
 calendar:subscribe("mouse.clicked", function(env)
-  -- I don't know how to split this across lines and have it still work.
-  sbar.exec("osascript -e 'tell application \"Microsoft Outlook\"' -e 'activate' -e 'set theWindow to first main window' -e 'set the view of theWindow to calendar view' -e 'end tell'")
+  sbar.exec(OPEN_OUTLOOK_CALENDAR)
 end)
+
+hover.widgets.add(calendar)

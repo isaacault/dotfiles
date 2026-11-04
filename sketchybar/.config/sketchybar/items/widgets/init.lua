@@ -1,4 +1,3 @@
--- require("items.widgets.notifications")
 require("items.widgets.calendar")
 require("items.widgets.pomodoro")
 require("items.widgets.battery")

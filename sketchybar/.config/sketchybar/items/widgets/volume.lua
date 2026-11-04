@@ -1,5 +1,6 @@
 local constants = require("constants")
 local settings = require("config.settings")
+local hover = require("util.hover")
 
 local currentAudioDevice = "None"
 
@@ -41,6 +42,12 @@ local function withOutputDevice(callback)
   end)
 end
 
+local function iconForDevice(device)
+  for _, entry in ipairs(settings.icons.audioDevices) do
+    if device:find(entry.match, 1, true) then return entry.icon end
+  end
+end
+
 volumeValue:subscribe("system_woke", function()
   cachedDevice = nil
 end)
@@ -50,14 +57,9 @@ volumeValue:subscribe("volume_change", function(env)
   local volume = tonumber(env.INFO)
 
   withOutputDevice(function(currentOutputDevice)
-    if currentOutputDevice == "OpenRun by Shokz" then
-      icon = ""
-    elseif currentOutputDevice:find("Bose 700", 1, true) then
-      icon = ""
-    elseif currentOutputDevice == "LinkBuds S" then
-      icon = ""
-    elseif currentOutputDevice:find("AirPods Pro", 1, true) then
-      icon = ""
+    local deviceIcon = iconForDevice(currentOutputDevice)
+    if deviceIcon then
+      icon = deviceIcon
     elseif volume > 60 then
       icon = settings.icons.text.volume._100
     elseif volume > 30 then
@@ -145,4 +147,5 @@ end
 
 volumeValue:subscribe("mouse.clicked", toggleVolumeDetails)
 volumeValue:subscribe("mouse.scrolled", changeVolume)
+hover.widgets.add(volumeValue)
 -- volumeValue:subscribe("mouse.exited.global", hideVolumeDetails)

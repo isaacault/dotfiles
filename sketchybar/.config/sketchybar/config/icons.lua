@@ -330,7 +330,17 @@ local text <const> = {
   },
 }
 
+-- First match wins. Matching is by plain substring, so owner names and
+-- apostrophe styles in the device name don't matter.
+local audioDevices <const> = {
+  { match = "Shokz", icon = "\u{f025}" },
+  { match = "Bose 700", icon = "\u{f025}" },
+  { match = "LinkBuds S", icon = "\u{f025}" },
+  { match = "AirPods Pro", icon = "\u{f025}" },
+}
+
 return {
   text = text.nerdfont,
   apps = apps,
+  audioDevices = audioDevices,
 }

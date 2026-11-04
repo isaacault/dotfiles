@@ -1,7 +1,11 @@
 local constants = require("constants")
 local settings = require("config.settings")
+local hover = require("util.hover")
+
+local LOW_BATTERY_ALERT <const> = 10
 
 local isCharging = false
+local lowBatteryAlerted = false
 
 local battery = sbar.add("item", constants.items.BATTERY, {
   position = "right",
@@ -36,6 +40,17 @@ battery:subscribe({ "routine", "power_source_change", "system_woke" }, function(
     local charging, _, _ = batteryInfo:find("AC Power")
 
     isCharging = charging
+
+    -- Warn once per discharge; re-arm after charging or recovering above the threshold.
+    if found and charge < LOW_BATTERY_ALERT and not charging then
+      if not lowBatteryAlerted then
+        lowBatteryAlerted = true
+        sbar.exec("sketchybar --trigger " .. constants.events.SEND_MESSAGE ..
+          " MESSAGE='Battery low: " .. charge .. "%' HOLD=false")
+      end
+    else
+      lowBatteryAlerted = false
+    end
 
     if charging then
       icon = settings.icons.text.battery.charging
@@ -75,6 +90,8 @@ battery:subscribe({ "routine", "power_source_change", "system_woke" }, function(
     })
   end)
 end)
+
+hover.widgets.add(battery)
 
 battery:subscribe("mouse.clicked", function(env)
   local drawing = battery:query().popup.drawing

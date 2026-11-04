@@ -1,7 +1,16 @@
 local constants = require("constants")
 local settings = require("config.settings")
+local hover = require("util.hover")
 
 local popupWidth <const> = settings.dimens.graphics.popup.width + 20
+
+-- The Wi-Fi interface isn't always en0 (docks and adapters shift the numbering).
+local wifiDevice = "en0"
+sbar.exec([[networksetup -listallhardwareports | awk '/Hardware Port: Wi-Fi/{getline; print $2; exit}']],
+  function(device)
+    device = device:gsub("%s+", "")
+    if device ~= "" then wifiDevice = device end
+  end)
 
 local wifi = sbar.add("item", constants.items.WIFI .. ".padding", {
   position = "right",
@@ -107,7 +116,7 @@ wifi:subscribe({ "wifi_change", "system_woke", "forced" }, function(env)
     }
   })
 
-  sbar.exec([[ipconfig getifaddr en0]], function(ip)
+  sbar.exec("ipconfig getifaddr " .. wifiDevice, function(ip)
     local ipConnected = not (ip == "")
 
     local wifiIcon
@@ -156,10 +165,10 @@ local function toggleDetails()
     sbar.exec("networksetup -getcomputername", function(result)
       hostname:set({ label = result })
     end)
-    sbar.exec("ipconfig getifaddr en0", function(result)
+    sbar.exec("ipconfig getifaddr " .. wifiDevice, function(result)
       ip:set({ label = result })
     end)
-    sbar.exec("ipconfig getsummary en0 | awk -F ' SSID : '  '/ SSID : / {print $2}'", function(result)
+    sbar.exec("ipconfig getsummary " .. wifiDevice .. " | awk -F ' SSID : '  '/ SSID : / {print $2}'", function(result)
       ssid:set({ label = result })
     end)
     sbar.exec("networksetup -getinfo Wi-Fi | awk -F 'Router: ' '/^Router: / {print $2}'", function(result)
@@ -181,6 +190,7 @@ local function copyLabelToClipboard(env)
 end
 
 wifi:subscribe("mouse.clicked", toggleDetails)
+hover.widgets.add(wifi)
 
 ssid:subscribe("mouse.clicked", copyLabelToClipboard)
 hostname:subscribe("mouse.clicked", copyLabelToClipboard)
