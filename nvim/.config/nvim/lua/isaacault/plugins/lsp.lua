@@ -13,36 +13,28 @@ return {
     "j-hui/fidget.nvim",
   },
   event = { "BufReadPost", "BufNewFile" },
-  cmd = { "LspInfo", "LspInstall", "LspUninstall" },
   config = function()
     -- Set up lspconfig.
     local capabilities = require('cmp_nvim_lsp').default_capabilities()
     require("fidget").setup()
-    require("mason").setup()
+    require("mason").setup({ PATH = "append" })
+
+    -- mason-lspconfig v2 enables installed servers itself (automatic_enable),
+    -- so configure them up front with vim.lsp.config.
+    vim.lsp.config("*", { capabilities = capabilities })
+    vim.lsp.config("lua_ls", {
+      settings = {
+        Lua = {
+          diagnostics = {
+            globals = { "vim" }
+          }
+        }
+      }
+    })
     require("mason-lspconfig").setup({
-      PATH = "append",
       ensure_installed = {
         "lua_ls",
         "rust_analyzer",
-      },
-      handlers = {
-        function(server_name)
-          vim.lsp.config(server_name, { capabilities = capabilities })
-          vim.lsp.enable(server_name)
-        end,
-        ["lua_ls"] = function()
-          vim.lsp.config('lua_ls', {
-            capabilities = capabilities,
-            settings = {
-              Lua = {
-                diagnostics = {
-                  globals = { "vim" }
-                }
-              }
-            }
-          })
-          vim.lsp.enable('lua_ls')
-        end,
       },
     })
 
