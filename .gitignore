@@ -1,5 +1,7 @@
-# Claude Code session artifacts (worktrees, local settings) — never part of the dotfiles
-.claude/
+# Claude Code session artifacts (worktrees, local settings) — never part of the dotfiles.
+# Anchored to the repo root: a bare `.claude/` also matched the claude package's
+# own claude/.claude/ directory and hid any new file added there.
+/.claude/
 
 # Fetched by scripts/fetch-plugins.sh, never tracked
 tmux/.config/tmux/plugins/

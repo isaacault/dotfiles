@@ -82,6 +82,9 @@ fi
 # Must come before the fzf and starship checks below, which need brew's PATH.
 if [[ $OSTYPE == darwin* ]]; then
   export BASH_SILENCE_DEPRECATION_WARNING=1
+  # BSD ls has no --color; CLICOLOR turns on its colours (Linux gets them from
+  # the dircolors block above)
+  export CLICOLOR=1
   if [ -x /opt/homebrew/bin/brew ]; then
     export HOMEBREW_PREFIX=/opt/homebrew HOMEBREW_CELLAR=/opt/homebrew/Cellar HOMEBREW_REPOSITORY=/opt/homebrew
     case ":$PATH:" in
