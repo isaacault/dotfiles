@@ -12,6 +12,23 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 
+# Versions for the Linux installers below. To bump one, look up the latest
+# release (gh api repos/<owner>/<repo>/releases/latest --jq .tag_name), change
+# it here, and check the installer URL still exists. Claude Code's installer
+# and glab (always the latest release) are not pinned. zoxide's installer has
+# no version flag: its pin fixes the script, but it still installs the latest.
+STARSHIP_VERSION="v1.27.0"   # starship/starship, tag with the leading v
+ZOXIDE_VERSION="v0.10.0"     # ajeetdsouza/zoxide, tag with the leading v
+UV_VERSION="0.13.7"          # astral-sh/uv, no leading v
+
+# scratch space for downloaded installers; removed on exit
+tmp="$(mktemp -d)"
+trap 'rm -rf "$tmp"' EXIT
+
+# fetch <url> <file>: download to a file so a failed or truncated download is
+# never executed
+fetch() { curl -fsSL --retry 3 "$1" -o "$2"; }
+
 devtools=0 gui=0 extras=0
 for arg in "$@"; do
   case "$arg" in
@@ -65,25 +82,43 @@ else
 
   # starship prompt
   if ! command -v starship >/dev/null 2>&1; then
-    curl -fsSL https://starship.rs/install.sh | sh -s -- -y -b "$HOME/.local/bin"
+    fetch https://starship.rs/install.sh "$tmp/starship.sh"
+    sh "$tmp/starship.sh" -y -v "$STARSHIP_VERSION" -b "$HOME/.local/bin"
   fi
 
   if [ "$devtools" -eq 1 ]; then
     # not in standard apt/dnf repos
-    command -v zoxide >/dev/null 2>&1 || curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh
-    command -v uv >/dev/null 2>&1 || curl -LsSf https://astral.sh/uv/install.sh | sh
+    if ! command -v zoxide >/dev/null 2>&1; then
+      fetch "https://raw.githubusercontent.com/ajeetdsouza/zoxide/${ZOXIDE_VERSION}/install.sh" "$tmp/zoxide.sh"
+      sh "$tmp/zoxide.sh"
+    fi
+    if ! command -v uv >/dev/null 2>&1; then
+      fetch "https://astral.sh/uv/${UV_VERSION}/install.sh" "$tmp/uv.sh"
+      sh "$tmp/uv.sh"
+    fi
     if ! command -v glab >/dev/null 2>&1; then
-      GLAB_VERSION=$(curl -fsSL https://gitlab.com/api/v4/projects/34675721/releases | grep -oP '"tag_name":"\Kv[^"]+' | head -1)
-      curl -fsSL "https://gitlab.com/gitlab-org/cli/-/releases/${GLAB_VERSION}/downloads/glab_${GLAB_VERSION#v}_linux_amd64.tar.gz" \
-        | tar xz -C "$HOME/.local/bin" --strip-components=2 bin/glab
+      case "$(uname -m)" in
+        x86_64|amd64) glab_arch=amd64 ;;
+        aarch64|arm64) glab_arch=arm64 ;;
+        *) echo "glab: unsupported architecture $(uname -m)" >&2; exit 1 ;;
+      esac
+      fetch https://gitlab.com/api/v4/projects/34675721/releases "$tmp/glab-releases.json"
+      GLAB_VERSION="$(jq -r '.[0].tag_name // empty' "$tmp/glab-releases.json")"
+      [ -n "$GLAB_VERSION" ] || { echo "glab: could not determine the latest version" >&2; exit 1; }
+      fetch "https://gitlab.com/gitlab-org/cli/-/releases/${GLAB_VERSION}/downloads/glab_${GLAB_VERSION#v}_linux_${glab_arch}.tar.gz" "$tmp/glab.tar.gz"
+      tar xzf "$tmp/glab.tar.gz" -C "$HOME/.local/bin" --strip-components=1 bin/glab
     fi
   fi
 fi
 
 # Claude Code CLI (cross-platform): the native installer symlinks
 # ~/.local/bin/claude. The -x test keeps this idempotent before PATH reloads.
+# The installer script can't be pinned or checksummed from here (it fetches
+# the current release itself); it is downloaded first so a failed download
+# never runs, and it is the vendor's own script, so this trusts claude.ai.
 if ! command -v claude >/dev/null 2>&1 && [ ! -x "$HOME/.local/bin/claude" ]; then
-  curl -fsSL https://claude.ai/install.sh | bash
+  fetch https://claude.ai/install.sh "$tmp/claude.sh"
+  bash "$tmp/claude.sh"
 fi
 
 # bash is the shell everywhere. macOS ships bash 3.2, so make Homebrew's the
