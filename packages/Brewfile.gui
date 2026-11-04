@@ -11,7 +11,6 @@ cask "karabiner-elements"   # caps lock -> control (also an optional, disabled c
 brew "sketchybar"
 brew "lua"                  # SbarLua, which sketchybar's Lua config loads
 brew "switchaudio-osx"      # volume widget (SwitchAudioSource)
-brew "nowplaying-cli"       # media widget buttons (previous / play-pause / next)
 
 cask "font-jetbrains-mono-nerd-font"   # alacritty and sketchybar
 cask "font-space-mono-nerd-font"       # sketchybar
