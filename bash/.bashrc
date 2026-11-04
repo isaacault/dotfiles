@@ -2,6 +2,63 @@
 # see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
 # for examples
 
+# --- environment (all shells) ---
+# Everything above the interactive guard below also applies to `bash -lc ...`
+# (via ~/.profile), where tools and agents expect brew, nvim etc. on PATH.
+# macOS /etc/profile (path_helper) reorders PATH in every login shell (tmux
+# panes, nested `bash -l`), so entries are stripped and re-prepended every time
+# rather than skipped when already present. Plain loops: works in bash 3.2.
+_path_strip() {
+  local d out= IFS=:
+  for d in $PATH; do
+    [ -n "$d" ] && [ "$d" != "$1" ] && out="${out:+$out:}$d"
+  done
+  PATH=$out
+}
+_path_prepend() { _path_strip "$1"; PATH="$1${PATH:+:$PATH}"; }
+_path_append() { _path_strip "$1"; PATH="${PATH:+$PATH:}$1"; }
+
+# user-local bins (prepended so they beat distro packages) and the Linux nvim
+# tarball; brew is prepended after these, below
+[ -d /opt/nvim-linux-x86_64/bin ] && _path_append /opt/nvim-linux-x86_64/bin
+[ -d "$HOME/.local/bin" ] && _path_prepend "$HOME/.local/bin"
+[ -d "$HOME/bin" ] && _path_prepend "$HOME/bin"
+
+# macOS: silence Apple's "default shell is now zsh" notice, and set up Homebrew
+# without forking `brew shellenv`: it spawns subprocesses, and each launch is
+# intercepted by endpoint security, which made new terminals slow. Mirrors its
+# output; compare after a brew upgrade with:
+#   env -i HOME=$HOME /opt/homebrew/bin/brew shellenv
+# Apple Silicon lives in /opt/homebrew, Intel in /usr/local.
+if [[ $OSTYPE == darwin* ]]; then
+  export BASH_SILENCE_DEPRECATION_WARNING=1
+  # BSD ls has no --color; CLICOLOR turns on its colours (Linux gets them from
+  # the dircolors block below)
+  export CLICOLOR=1
+  for _brew_prefix in /opt/homebrew /usr/local; do
+    if [ -x "$_brew_prefix/bin/brew" ]; then
+      if [ "$_brew_prefix" = /opt/homebrew ]; then
+        export HOMEBREW_PREFIX=$_brew_prefix HOMEBREW_CELLAR=$_brew_prefix/Cellar HOMEBREW_REPOSITORY=$_brew_prefix
+      else
+        export HOMEBREW_PREFIX=$_brew_prefix HOMEBREW_CELLAR=$_brew_prefix/Cellar HOMEBREW_REPOSITORY=$_brew_prefix/Homebrew
+      fi
+      _path_prepend "$HOMEBREW_PREFIX/sbin"
+      _path_prepend "$HOMEBREW_PREFIX/bin"
+      case ":${INFOPATH:-}:" in
+        *":$HOMEBREW_PREFIX/share/info:"*) ;;
+        *) export INFOPATH="$HOMEBREW_PREFIX/share/info:${INFOPATH:-}" ;;
+      esac
+      break
+    fi
+  done
+  unset _brew_prefix
+fi
+export PATH
+
+export EDITOR=nvim
+export VISUAL=nvim
+unset -f _path_strip _path_prepend _path_append
+
 # If not running interactively, don't do anything
 case $- in
     *i*) ;;
@@ -74,34 +131,10 @@ fi
 
 # --- personal (https://github.com/isaacault/dotfiles) ---
 
-# macOS: silence Apple's "default shell is now zsh" notice, and set up Homebrew
-# without forking `brew shellenv`: it spawns subprocesses, and each launch is
-# intercepted by endpoint security, which made new terminals slow. Mirrors its
-# output; compare after a brew upgrade with:
-#   env -i HOME=$HOME /opt/homebrew/bin/brew shellenv
-# Must come before the fzf and starship checks below, which need brew's PATH.
-if [[ $OSTYPE == darwin* ]]; then
-  export BASH_SILENCE_DEPRECATION_WARNING=1
-  # BSD ls has no --color; CLICOLOR turns on its colours (Linux gets them from
-  # the dircolors block above)
-  export CLICOLOR=1
-  if [ -x /opt/homebrew/bin/brew ]; then
-    export HOMEBREW_PREFIX=/opt/homebrew HOMEBREW_CELLAR=/opt/homebrew/Cellar HOMEBREW_REPOSITORY=/opt/homebrew
-    case ":$PATH:" in
-      *":$HOMEBREW_PREFIX/bin:"*) ;;
-      *) export PATH="$HOMEBREW_PREFIX/bin:$HOMEBREW_PREFIX/sbin:$PATH" ;;
-    esac
-    case ":${INFOPATH:-}:" in
-      *":$HOMEBREW_PREFIX/share/info:"*) ;;
-      *) export INFOPATH="$HOMEBREW_PREFIX/share/info:${INFOPATH:-}" ;;
-    esac
-    # bash-completion@2 (needs bash >= 4.2; its loader skips older bash)
-    [ -r "$HOMEBREW_PREFIX/etc/profile.d/bash_completion.sh" ] && . "$HOMEBREW_PREFIX/etc/profile.d/bash_completion.sh"
-  fi
-fi
+# macOS: Homebrew bash-completion@2 (needs bash >= 4.2; its loader skips older
+# bash). PATH/HOMEBREW_* are set above the guard.
+[ -n "${HOMEBREW_PREFIX:-}" ] && [ -r "$HOMEBREW_PREFIX/etc/profile.d/bash_completion.sh" ] && . "$HOMEBREW_PREFIX/etc/profile.d/bash_completion.sh"
 
-export EDITOR=nvim
-export VISUAL=nvim
 alias vim='nvim'
 alias vi='nvim'
 alias vimdiff='nvim -d'
@@ -119,13 +152,6 @@ bind 'set completion-ignore-case on'
 bind 'set show-all-if-ambiguous on'
 bind 'set colored-stats on'
 bind 'set mark-symlinked-directories on'
-
-# user-local bins
-case ":$PATH:" in
-  *":$HOME/.local/bin:"*) ;;
-  *) export PATH="$PATH:$HOME/.local/bin" ;;
-esac
-[ -d /opt/nvim-linux-x86_64/bin ] && export PATH="$PATH:/opt/nvim-linux-x86_64/bin"
 
 # fzf: Ctrl-R fuzzy history, Ctrl-T file picker
 if command -v fzf >/dev/null 2>&1; then
