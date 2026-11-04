@@ -7,6 +7,7 @@
 #   cmd-esc          toggle floating          cmd-shift-f      fullscreen
 #   cmd-g + h/j/k/l  join: group focused window with its neighbor into a container
 #   alt-g / alt-v    split: next window opens beside / below the focused one
+#   alt-shift-r      reset layout: flatten nested containers, tiles, equal sizes
 #https://github.com/edunfelt/base16-rose-pine-scheme/blob/main/assets/palette.png
 start-at-login = true
 
@@ -57,7 +58,10 @@ PATH = '/opt/homebrew/bin:/opt/homebrew/sbin:${PATH}'
 [mode.main.binding]
 cmd-esc = 'layout floating tiling'
 cmd-e = 'layout tiles horizontal vertical' # Default
-cmd-s = 'layout accordion horizontal vertical' # Tabbed / Stacking 
+cmd-s = 'layout accordion horizontal vertical' # Tabbed / Stacking
+# Reset a messy workspace in one key. Needed because normalization is off (above), so a
+# split or accordion survives after its other windows close. Same as service mode `r`.
+alt-shift-r = ['flatten-workspace-tree', 'layout tiles', 'balance-sizes']
 cmd-shift-r = [
   'mode resize',
   'exec-and-forget sketchybar --trigger send_message MESSAGE="RESIZE MODE" HOLD="true"'
@@ -153,7 +157,7 @@ esc = [
  'exec-and-forget sketchybar --reload',
  'mode main'
 ]
-r = ['flatten-workspace-tree', 'exec-and-forget sketchybar --trigger hide_message', 'mode main'] # reset layout
+r = ['flatten-workspace-tree', 'layout tiles', 'balance-sizes', 'exec-and-forget sketchybar --trigger hide_message', 'mode main'] # reset layout (same as alt-shift-r)
 #s = ['layout sticky tiling', 'mode main'] # sticky is not yet supported https://github.com/nikitabobko/AeroSpace/issues/2
 
 s = [
