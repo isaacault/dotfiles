@@ -30,9 +30,20 @@ vim.api.nvim_create_autocmd("TextYankPost", {
     callback = function() vim.highlight.on_yank() end,
 })
 
--- Strip trailing whitespace on save.
+-- Strip trailing whitespace on save, except where it is meaningful (Markdown
+-- hard breaks, diff context lines, mail signatures) or the buffer is not
+-- editable.
+local no_trim_filetypes = { markdown = true, diff = true, gitcommit = true, mail = true }
+
 vim.api.nvim_create_autocmd("BufWritePre", {
     group = vim.api.nvim_create_augroup("trim_trailing_whitespace", { clear = true }),
     pattern = "*",
-    command = [[%s/\s\+$//e]],
+    callback = function()
+        if not vim.bo.modifiable or vim.bo.binary or no_trim_filetypes[vim.bo.filetype] then
+            return
+        end
+        local view = vim.fn.winsaveview()
+        vim.cmd([[keeppatterns %s/\s\+$//e]])
+        vim.fn.winrestview(view)
+    end,
 })
