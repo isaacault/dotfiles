@@ -15,9 +15,16 @@
 	path = ~/.gitconfig.local
 
 # Personal GitHub repos always commit under the personal identity, even on
-# work machines: covers this dotfiles repo and every isaacault/* clone.
+# work machines: covers this dotfiles repo and every isaacault/* clone, in scp,
+# https and ssh:// URL forms (also over github.com:443 via ssh.github.com).
 # (git >= 2.36; older gits ignore the condition harmlessly.)
 [includeIf "hasconfig:remote.*.url:git@github.com:isaacault/**"]
 	path = ~/.config/git/personal
 [includeIf "hasconfig:remote.*.url:https://github.com/isaacault/**"]
+	path = ~/.config/git/personal
+[includeIf "hasconfig:remote.*.url:ssh://git@github.com/isaacault/**"]
+	path = ~/.config/git/personal
+[includeIf "hasconfig:remote.*.url:git@ssh.github.com:isaacault/**"]
+	path = ~/.config/git/personal
+[includeIf "hasconfig:remote.*.url:ssh://git@ssh.github.com/isaacault/**"]
 	path = ~/.config/git/personal
