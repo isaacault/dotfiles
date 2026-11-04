@@ -9,6 +9,12 @@
 #   alt-g / alt-v    split: next window opens beside / below the focused one
 #   alt-shift-r      reset layout: flatten nested containers, tiles, equal sizes
 #https://github.com/edunfelt/base16-rose-pine-scheme/blob/main/assets/palette.png
+# config-version 2: persistent-workspaces must be listed explicitly (version 1 inferred
+# them from the cmd-1..0 bindings). Keep 1-10 alive so sketchybar's workspace
+# items, built from `aerospace list-workspaces --all`, show all ten.
+config-version = 2
+persistent-workspaces = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10']
+
 start-at-login = true
 
 after-login-command = []
