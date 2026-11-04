@@ -4,7 +4,7 @@
 #
 #   ./install.sh            core packages (shell, git, nvim, tmux, starship, claude)
 #   ./install.sh --gui      also the GUI packages for this OS
-#                           (Linux: sway, swaync, waybar; macOS: aerospace, sketchybar)
+#                           (Linux: sway, swaync, waybar; macOS: aerospace, sketchybar, karabiner)
 #   ./install.sh -n         dry run: show what stow would do, change nothing
 #
 # --no-folding makes stow link individual files and never a whole directory.
@@ -31,7 +31,7 @@ pkgs=(bash git nvim tmux starship claude)
 if [ "$gui" -eq 1 ]; then
   pkgs+=(alacritty)
   [ "$(uname)" = "Linux" ] && pkgs+=(sway swaync waybar)
-  [ "$(uname)" = "Darwin" ] && pkgs+=(aerospace sketchybar)
+  [ "$(uname)" = "Darwin" ] && pkgs+=(aerospace sketchybar karabiner)
 fi
 
 stow --no-folding ${dry[@]+"${dry[@]}"} -d "$PWD" -t "$HOME" -R "${pkgs[@]}"

@@ -25,10 +25,12 @@ if [ "$(uname)" = "Linux" ]; then
   [ -x "$H1/.config/waybar/mediaplayer.sh" ]  || fail "waybar script not executable"
   [ ! -e "$H1/.config/aerospace" ]            || fail "aerospace linked on Linux"
   [ ! -e "$H1/.config/sketchybar" ]           || fail "sketchybar linked on Linux"
+  [ ! -e "$H1/.config/karabiner" ]            || fail "karabiner linked on Linux"
 else
   [ ! -e "$H1/.config/sway" ]                 || fail "sway linked on non-Linux"
   [ -f "$H1/.config/aerospace/aerospace.toml" ]  || fail "aerospace missing (--gui)"
   [ -f "$H1/.config/sketchybar/sketchybarrc" ]   || fail "sketchybar missing (--gui)"
+  [ -L "$H1/.config/karabiner/karabiner.json" ]  || fail "karabiner.json not linked (--gui)"
   [ ! -e "$SRC/aerospace/.config/aerospace/cheatsheet" ] || fail "built binary leaked into the repo"
 fi
 [ ! -e "$H1/README.md" ]                      || fail "README leaked"
@@ -55,6 +57,7 @@ HOME="$H2" "$SRC/install.sh"
 [ ! -e "$H2/.config/alacritty" ]              || fail "alacritty linked without --gui"
 [ ! -e "$H2/.config/aerospace" ]              || fail "aerospace linked without --gui"
 [ ! -e "$H2/.config/sketchybar" ]             || fail "sketchybar linked without --gui"
+[ ! -e "$H2/.config/karabiner" ]              || fail "karabiner linked without --gui"
 rm -rf "$H2"
 echo "case 2 (core only) OK"
 

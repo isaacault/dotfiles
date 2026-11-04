@@ -18,7 +18,7 @@ starship/.config/starship.toml
 claude/.claude/keybindings.json
 alacritty/                               GUI package (both OSes)
 sway/, swaync/, waybar/                  GUI packages (Linux)
-aerospace/, sketchybar/                  GUI packages (macOS)
+aerospace/, sketchybar/, karabiner/      GUI packages (macOS)
 ```
 
 `stow nvim` makes `~/.config/nvim/...` symlinks into `nvim/.config/nvim/...`.
@@ -73,7 +73,7 @@ distro versions lag. To see what a Brewfile would still install on a Mac:
 - **nvim**: full lazy.nvim config, `lazy-lock.json` pins plugins
 - **git**: shared identity; `~/.gitconfig.local` for machine-local extras
 - **Claude Code**: `keybindings.json` only; `CLAUDE.md`, `settings.json` and skills live in a separate private repo
-- **GUI (optional)**: sway, swaync, waybar, alacritty, aerospace, sketchybar
+- **GUI (optional)**: sway, swaync, waybar, alacritty, aerospace, sketchybar, karabiner
 - **work (optional)**: a private overlay repo owns all work-specific config; see below
 
 ## Git identity
