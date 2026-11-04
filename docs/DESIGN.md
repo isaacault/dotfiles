@@ -80,9 +80,14 @@ re-run it once access is sorted. The key itself must be registered first.
 
 ## Claude Code
 
-`~/.claude/keybindings.json` and `~/.claude/statusline.py`. The script is
-linked, but `settings.json` (which turns it on) is not, so each machine opts in
-with one `statusLine` entry. `CLAUDE.md` and `settings.json` live in a
+`~/.claude/keybindings.json` and `~/.claude/statusline.py` are linked;
+`settings.json` (which turns the status line on) is not, so each machine opts
+in with one entry: `statusLine` for a status row of its own, or
+`CLAUDE_CODE_PLUGIN_DIRS` in `env` naming `~/dotfiles/claude-mods/footer-status`,
+a mod that puts the same figures on the footer row next to the mode labels
+(the only way onto that row; no `statusLine` option does it). The mod lives
+outside the stow packages because Claude Code reads a plugin without following
+symlinks, so it is loaded from the repo folder itself. `CLAUDE.md` and `settings.json` live in a
 separate private repo. Config only, never state/credentials (`~/.claude.json`,
 sessions, history, etc. stay out), and never the work-internal,
 externally-managed `skills/`.
