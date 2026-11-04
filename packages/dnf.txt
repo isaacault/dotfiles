@@ -1,0 +1,15 @@
+# Core packages for Fedora/RHEL. One per line; blank lines and # comments ignored.
+# Read by scripts/install-packages.sh. neovim and starship come from their own
+# installers there (distro versions lag).
+stow
+git
+curl
+tmux
+fzf
+ripgrep
+fd-find
+xclip
+jq
+gcc
+gcc-c++
+make

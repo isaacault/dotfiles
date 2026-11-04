@@ -1,0 +1,21 @@
+# macOS GUI stack: what the alacritty, aerospace and sketchybar packages need.
+#   brew bundle --file=packages/Brewfile.gui   (install-packages.sh --gui)
+
+tap "felixkratz/formulae"   # sketchybar
+tap "nikitabobko/tap"       # aerospace
+
+cask "alacritty"
+cask "aerospace"
+cask "karabiner-elements"   # key remaps (caps lock -> control, ctrl-c/v like Linux)
+
+brew "sketchybar"
+brew "lua"                  # SbarLua, which sketchybar's Lua config loads
+brew "switchaudio-osx"      # volume widget (SwitchAudioSource)
+brew "nowplaying-cli"       # media widget buttons (previous / play-pause / next)
+
+cask "font-jetbrains-mono-nerd-font"   # alacritty and sketchybar
+cask "font-space-mono-nerd-font"       # sketchybar
+cask "font-sketchybar-app-font"        # app icons in the bar
+
+# Not installed by brew: SbarLua itself. sketchybar/install/sbar.lua expects it
+# in ~/.local/share/sketchybar_lua (build it from FelixKratz/SbarLua).

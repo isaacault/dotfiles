@@ -1,30 +1,51 @@
 #!/bin/bash
 # SPDX-License-Identifier: MIT
 # Core tool install (stow included). Run by hand on a new machine:
-#   scripts/install-packages.sh [--devtools]
-# --devtools also installs the enhanced CLI tools (eza, bat, zoxide, uv, glab, node).
+#   scripts/install-packages.sh [--devtools] [--gui] [--extras]
+# The package lists live in packages/: Brewfile* on macOS, *.txt for apt/dnf.
+#   always      packages/Brewfile           packages/{apt,dnf}.txt
+#   --devtools  packages/Brewfile.devtools  packages/{apt,dnf}-devtools.txt
+#               (eza, bat, zoxide, uv, glab, node)
+#   --gui       packages/Brewfile.gui       macOS only
+#   --extras    packages/Brewfile.extras    macOS only: personal, not needed by the configs
 set -euo pipefail
 
-devtools=0
-[ "${1:-}" = "--devtools" ] && devtools=1
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+
+devtools=0 gui=0 extras=0
+for arg in "$@"; do
+  case "$arg" in
+    --devtools) devtools=1 ;;
+    --gui) gui=1 ;;
+    --extras) extras=1 ;;
+    *) echo "usage: $0 [--devtools] [--gui] [--extras]" >&2; exit 2 ;;
+  esac
+done
+
+# package names from a manifest: one per line, blank lines and # comments ignored
+pkgs() { grep -v -E '^[[:space:]]*(#|$)' "$ROOT/packages/$1"; }
 
 if [ "$(uname)" = "Darwin" ]; then
   command -v brew >/dev/null 2>&1 || { echo "Homebrew required first: https://brew.sh" >&2; exit 1; }
-  brew install stow git tmux bash bash-completion@2 fzf ripgrep fd jq neovim starship
-  [ "$devtools" -eq 1 ] && brew install bat eza zoxide uv glab node
+  brew bundle --file="$ROOT/packages/Brewfile"
+  [ "$devtools" -eq 1 ] && brew bundle --file="$ROOT/packages/Brewfile.devtools"
+  [ "$gui" -eq 1 ] && brew bundle --file="$ROOT/packages/Brewfile.gui"
+  [ "$extras" -eq 1 ] && brew bundle --file="$ROOT/packages/Brewfile.extras"
 else
+  [ "$gui" -eq 1 ] || [ "$extras" -eq 1 ] && echo "note: --gui and --extras have no Linux package lists yet; ignoring" >&2
+
   SUDO=""
   [ "$(id -u)" -ne 0 ] && SUDO="sudo"
 
   if command -v apt-get >/dev/null 2>&1; then
     $SUDO apt-get update -qq
-    $SUDO apt-get install -y -qq stow git curl tmux fzf ripgrep fd-find xclip jq build-essential
-    [ "$devtools" -eq 1 ] && $SUDO apt-get install -y -qq bat eza nodejs npm
+    pkgs apt.txt | xargs $SUDO apt-get install -y -qq
+    [ "$devtools" -eq 1 ] && pkgs apt-devtools.txt | xargs $SUDO apt-get install -y -qq
   elif command -v dnf >/dev/null 2>&1; then
-    $SUDO dnf install -y -q stow git curl tmux fzf ripgrep fd-find xclip jq gcc gcc-c++ make
-    [ "$devtools" -eq 1 ] && $SUDO dnf install -y -q bat eza nodejs npm
+    pkgs dnf.txt | xargs $SUDO dnf install -y -q
+    [ "$devtools" -eq 1 ] && pkgs dnf-devtools.txt | xargs $SUDO dnf install -y -q
   else
-    echo "No supported package manager (apt/dnf): install stow, git, tmux, fzf, ripgrep, fd, jq manually" >&2
+    echo "No supported package manager (apt/dnf): install the packages in packages/apt.txt manually" >&2
   fi
 
   mkdir -p "$HOME/.local/bin" "$HOME/.local/opt"

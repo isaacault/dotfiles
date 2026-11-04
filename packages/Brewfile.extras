@@ -1,0 +1,49 @@
+# Personal extras: what is installed on the author's Mac beyond the repo's own
+# needs. Prune freely; nothing in the configs depends on these.
+#   brew bundle --file=packages/Brewfile.extras   (install-packages.sh --extras)
+
+tap "cassettelab/cassette"
+
+# everyday CLI
+brew "gh"
+brew "git-lfs"
+brew "mas"
+brew "mosh"
+brew "openvpn"
+brew "pipx"
+brew "wget"
+
+# build and language tooling
+brew "bazelisk"
+brew "cmake"
+brew "luarocks"
+brew "mold"
+brew "ninja"
+brew "openjdk@17"
+brew "pkgconf"
+brew "xcodegen"
+
+# libraries installed explicitly for local builds
+brew "cairo"
+brew "cppzmq"
+brew "giflib"
+brew "jpeg"
+brew "libpng"
+brew "librsvg"
+brew "pango"
+brew "zeromq"
+
+# documents and media
+brew "graphviz"
+brew "navidrome"
+brew "poppler"
+cask "cassette"
+cask "flowvision"
+cask "libreoffice"
+cask "qutebrowser"
+
+# apps and fonts
+cask "android-commandlinetools"
+cask "font-hack-nerd-font"
+cask "iterm2"
+cask "sf-symbols"

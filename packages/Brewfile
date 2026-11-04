@@ -1,0 +1,15 @@
+# Core CLI tools for this repo's configs (macOS).
+#   brew bundle --file=packages/Brewfile      (scripts/install-packages.sh does this)
+# GUI, dev tools and personal extras are separate: Brewfile.gui, .devtools, .extras.
+
+brew "stow"
+brew "git"
+brew "tmux"
+brew "bash"               # macOS ships 3.2; the login shell should be this one
+brew "bash-completion@2"
+brew "fzf"
+brew "ripgrep"
+brew "fd"
+brew "jq"
+brew "neovim"
+brew "starship"

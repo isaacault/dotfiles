@@ -1,0 +1,6 @@
+# Dev tools for Debian/Ubuntu (install-packages.sh --devtools).
+# zoxide, uv and glab are not packaged; the script installs them separately.
+bat
+eza
+nodejs
+npm

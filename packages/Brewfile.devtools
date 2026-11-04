@@ -1,0 +1,9 @@
+# Enhanced CLI dev tools (macOS).
+#   brew bundle --file=packages/Brewfile.devtools   (install-packages.sh --devtools)
+
+brew "bat"
+brew "eza"
+brew "zoxide"
+brew "uv"
+brew "glab"
+brew "node"

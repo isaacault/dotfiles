@@ -29,7 +29,7 @@ Edit either path; `git status` here shows the change.
 ```sh
 git clone https://github.com/isaacault/dotfiles ~/dotfiles
 cd ~/dotfiles
-scripts/install-packages.sh [--devtools]   # stow, git, tmux, nvim, starship, claude (+ bash on macOS)
+scripts/install-packages.sh [--devtools] [--gui] [--extras]   # see "Package lists" below
 scripts/fetch-plugins.sh                   # pinned tmux plugins
 ./install.sh -n                            # dry run: what would be linked
 ./install.sh [--gui]                       # link it
@@ -42,11 +42,29 @@ conflict, diff the existing file against the repo and move one aside.
 on macOS. On macOS also run `scripts/build-swift-tools.sh` once: it compiles
 the aerospace cheat sheet and the sketchybar pomodoro panel from the Swift
 sources (the binaries are gitignored build output). aerospace and sketchybar
-themselves come from Homebrew; sketchybar's Lua module (SbarLua) is installed
-separately into `~/.local/share/sketchybar_lua`. Packages can also be
+themselves come from `packages/Brewfile.gui`; sketchybar's Lua module (SbarLua)
+is not packaged and is installed separately into `~/.local/share/sketchybar_lua`.
+Packages can also be
 linked individually: `stow --no-folding -t ~ nvim`. `--no-folding` matters:
 it stops stow linking whole directories, which would let fetched plugins
 land inside this repo.
+
+## Package lists
+
+What `scripts/install-packages.sh` installs is kept in `packages/`, one list per
+purpose, so the lists are the single place to edit:
+
+| flag | macOS (`brew bundle`) | Linux (apt / dnf) |
+|---|---|---|
+| always | `Brewfile` | `apt.txt` / `dnf.txt` |
+| `--devtools` | `Brewfile.devtools` | `apt-devtools.txt` / `dnf-devtools.txt` |
+| `--gui` | `Brewfile.gui` | none yet |
+| `--extras` | `Brewfile.extras` (personal, optional) | none |
+
+The `.txt` lists take one package per line; blank lines and `#` comments are
+ignored. neovim and starship come from their own installers on Linux, because
+distro versions lag. To see what a Brewfile would still install on a Mac:
+`brew bundle check --no-upgrade --verbose --file=packages/Brewfile.gui`.
 
 ## What's managed
 
