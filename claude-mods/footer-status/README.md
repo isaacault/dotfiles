@@ -11,6 +11,13 @@ so it costs no tokens and less CPU than a status-line command, which spawns a
 process on every redraw. It refreshes after every
 turn through the `session.measure` event.
 
+The row never wraps. As the terminal narrows the figures drop, in order: the
+model, the "ctx" label, the bar, the directory, the cost, and last the
+percentage. The hint on the left loses "↓ to manage". The permission-mode label
+("auto mode on") is drawn by Claude Code itself and no mod can hide it, so its
+width is counted instead, read from the permission mode of the last prompt or
+tool call.
+
 Claude Code hands a mod the model ID (`claude-opus-5-5`), so the footer turns
 it into the name the `/model` picker shows (`Opus 5.5`); a `[1m]` ID gets
 `(1M context)`, and anything else is shown as it comes.

@@ -9,6 +9,6 @@ export type Snapshot = {
 
 declare module 'claude-code' {
   interface PluginState {
-    'footer-status': { snapshot: Snapshot | null }
+    'footer-status': { snapshot: Snapshot | null; mode: string | null }
   }
 }

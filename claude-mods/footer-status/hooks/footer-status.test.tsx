@@ -46,3 +46,19 @@ test('before the first reply the context shows no fill', async ($, on) => {
   expect(await ui.find({ type: 'Text', text: /\$/ })).toBeUndefined()
   await ui.unmount()
 })
+
+test('the hint line drops "to manage" and keeps the shell count', async ($, on) => {
+  on('ui.render', ($, e) => {
+    const { Text } = $.ui.resolve(e)
+    return <Text>engine</Text>
+  })
+  const ui = await $.ui.mount({
+    plugin: 'footer-status',
+    component: 'PromptHint',
+    props: { isDraft: false, isWorking: false, hint: '2 shells · ↓ to manage' },
+    surface: 'terminal',
+  })
+  expect((await ui.find({ type: 'Text', text: /shells/ }))?.text).toBe('2 shells')
+  expect(await ui.find({ type: 'Text', text: /manage/ })).toBeUndefined()
+  await ui.unmount()
+})

@@ -1,24 +1,24 @@
-// footer-status: draws "Fable 5.1 | ctx ███░░░░░░░ 28% | $95.91 | .config" on
-// the prompt footer row, to the right of the mode labels ("auto mode on"),
-// where a statusLine command would take a row of its own. Same figures and
-// colours as ~/.claude/statusline.py, with the context fill drawn as a bar.
+// footer-status: the prompt footer row as one line at any width.
+//
+//   ⏵⏵ auto mode on · 1 shell          Opus 5.5 | ctx ███░░░░░░░ 32% | $107.48 | .config
+//
+// The figures (the SessionMode site, right of the row) shrink to the room the
+// row has left, so the row never wraps: see layout.ts for the order parts go
+// in. The hint (PromptHint, left) loses "↓ to manage". The permission-mode
+// label is the engine's own and no mod can change it; its width is counted.
+
 import { atom, read, update } from 'claude-code'
 import type { EngineInterface, Register } from 'claude-code'
 
 import type { Snapshot } from '../types'
+import { columns, hintParts, layout, modeLabelColumns, SEP } from './layout'
 import { displayName } from './names'
 
 const snapshot = atom({ plugin: 'footer-status', key: 'snapshot' } as const, null)
+const mode = atom({ plugin: 'footer-status', key: 'mode' } as const, null)
 
-const BAR_CELLS = 10
-
-// Ten cells, filled in proportion to the context window used; all empty
-// before the first reply, when there is no figure yet.
-function bar(pct: number | null): string {
-  if (pct === null) return '░'.repeat(BAR_CELLS)
-  const filled = Math.min(BAR_CELLS, Math.max(0, Math.round((pct / 100) * BAR_CELLS)))
-  return '█'.repeat(filled) + '░'.repeat(BAR_CELLS - filled)
-}
+// Columns kept free: the row's margins and the gap between its two halves.
+const SLACK = 6
 
 function basename(path: string): string {
   const trimmed = path.replace(/\/+$/, '')
@@ -48,6 +48,9 @@ async function refresh($: EngineInterface): Promise<void> {
 }
 
 export const register: Register = on => {
+  // Columns the hint line takes as drawn; the figures fit around it.
+  let hintColumns = 0
+
   on('session.start', async ($, e, next) => {
     await refresh($)
     return next(e)
@@ -57,6 +60,37 @@ export const register: Register = on => {
   on('session.measure', async ($, e, next) => {
     await refresh($)
     return next(e)
+  })
+
+  // The permission mode, for the width of the engine's label. These only
+  // watch: on any failure the prompt or tool call goes on untouched.
+  on('classic.UserPromptSubmit', async ($, e, next) => {
+    if (e.permission_mode) await update($, mode, () => e.permission_mode ?? null)
+    return next(e)
+  }).catch(($, e, next) => next(e))
+  on('classic.PostToolUse', async ($, e, next) => {
+    if (e.permission_mode) await update($, mode, () => e.permission_mode ?? null)
+    return next(e)
+  }).catch(($, e, next) => next(e))
+
+  on('ui.render', { component: 'PromptHint' }, async ($, e, next) => {
+    const { kept, changed } = hintParts(e.props.hint)
+    const drawn = columns(kept.join(' · '))
+    if (drawn !== hintColumns) {
+      hintColumns = drawn
+      $.ui.invalidate('ui.render') // the figures re-fit to the new room
+    }
+    if (!changed) return next(e)
+
+    const { Box, Text } = $.ui.resolve(e)
+    return (
+      <Box>
+        {kept.map((part, i) => [
+          i > 0 ? <Text dimColor> · </Text> : null,
+          /^\d+ shells?$/.test(part) ? <Text color="cyan">{part}</Text> : <Text dimColor>{part}</Text>,
+        ])}
+      </Box>
+    )
   })
 
   on('ui.render', { component: 'SessionMode' }, async ($, e, next) => {
@@ -71,26 +105,28 @@ export const register: Register = on => {
 
     const { Box, Text } = $.ui.resolve(e)
     const engine = await next(e)
-    const sep = () => <Text dimColor> | </Text>
 
     const pct =
       s.percent ?? (s.tokens !== null && s.window > 0 ? Math.round((100 * s.tokens) / s.window) : null)
-    const hot = pct !== null && pct >= 80 ? 'red' : pct !== null && pct >= 60 ? 'yellow' : null
-    const ctx = pct === null ? `ctx ${bar(null)} --` : `ctx ${bar(pct)} ${pct}%`
+    const modes = e.props.modes.length > 0 ? columns(e.props.modes.join(' & ')) + 3 : 0
+    const label = modeLabelColumns(await read($, mode))
+    const left = label + (label > 0 && hintColumns > 0 ? 3 : 0) + hintColumns
+    const room = e.viewport ? e.viewport.columns - left - modes - SLACK : Number.POSITIVE_INFINITY
 
-    const parts = [
-      <Text color="cyan">{displayName(s.model)}</Text>,
-      sep(),
-      hot ? <Text color={hot}>{ctx}</Text> : <Text dimColor>{ctx}</Text>,
-    ]
-    if (s.usd !== null) parts.push(sep(), <Text dimColor>${s.usd.toFixed(2)}</Text>)
-    if (s.dir) parts.push(sep(), <Text dimColor>{s.dir}</Text>)
+    const l = layout({ model: displayName(s.model), percent: pct, usd: s.usd, dir: s.dir }, room)
+    const hot = pct !== null && pct >= 80 ? 'red' : pct !== null && pct >= 60 ? 'yellow' : null
+
+    const parts = []
+    if (l.model) parts.push(<Text color="cyan">{l.model}</Text>)
+    if (l.ctx) parts.push(hot ? <Text color={hot}>{l.ctx}</Text> : <Text dimColor>{l.ctx}</Text>)
+    if (l.cost) parts.push(<Text dimColor>{l.cost}</Text>)
+    if (l.dir) parts.push(<Text dimColor>{l.dir}</Text>)
 
     return (
       <Box>
         {engine}
-        {e.props.modes.length > 0 ? <Text dimColor> · </Text> : null}
-        {parts}
+        {e.props.modes.length > 0 && parts.length > 0 ? <Text dimColor> · </Text> : null}
+        {parts.map((p, i) => [i > 0 ? <Text dimColor>{SEP}</Text> : null, p])}
       </Box>
     )
   })
