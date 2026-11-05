@@ -80,12 +80,14 @@ re-run it once access is sorted. The key itself must be registered first.
 
 ## Claude Code
 
-`~/.claude/keybindings.json` and `~/.claude/statusline.py` are linked;
-`settings.json` (which turns the status line on) is not, so each machine opts
-in with one entry: `statusLine` for a status row of its own, or
-`CLAUDE_CODE_PLUGIN_DIRS` in `env` naming `~/dotfiles/claude-mods/footer-status`,
-a mod that puts the same figures on the footer row next to the mode labels
-(the only way onto that row; no `statusLine` option does it). The mod lives
+`~/.claude/keybindings.json` is linked; `settings.json` is not, so each
+machine opts in to the footer with one entry: `CLAUDE_CODE_PLUGIN_DIRS` in
+`env` naming the repo's `claude-mods/footer-status`, a mod that puts model,
+context, cost or usage limits, and directory on the footer row next to the
+mode labels (the only way onto that row). A `statusLine` script with the same
+figures was dropped on 2026-11-05: the mod made it redundant, and two copies
+of the logic drifted. It is in git history if an IDE extension, which has no
+footer row, ever needs it. The mod lives
 outside the stow packages because Claude Code reads a plugin without following
 symlinks, so it is loaded from the repo folder itself. `CLAUDE.md` and `settings.json` live in a
 separate private repo. Config only, never state/credentials (`~/.claude.json`,

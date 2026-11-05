@@ -15,7 +15,7 @@ git/.gitconfig, .config/git/
 nvim/.config/nvim/
 tmux/.config/tmux/
 starship/.config/starship.toml
-claude/.claude/keybindings.json, statusline.py
+claude/.claude/keybindings.json
 alacritty/                               GUI package (both OSes)
 sway/, swaync/, waybar/                  GUI packages (Linux)
 aerospace/, sketchybar/                  GUI packages (macOS)
@@ -84,7 +84,7 @@ newer, or Fedora; Nerd Fonts are not packaged, so download them into
 - **tmux**: `~/.config/tmux/tmux.conf`; plugins fetched by `scripts/fetch-plugins.sh` (pinned tpm, catppuccin, resurrect, continuum)
 - **nvim**: full lazy.nvim config, `lazy-lock.json` pins plugins
 - **git**: shared identity; `~/.gitconfig.local` for machine-local extras
-- **Claude Code**: `keybindings.json`, a status-line script (`statusline.py`: model, context, cost, directory) and `claude-mods/footer-status`, a mod that draws the same figures on the prompt footer row beside "auto mode on" instead of on a row of their own; `CLAUDE.md`, `settings.json` and skills live in a separate private repo. Pick one in `~/.claude/settings.json`: `"statusLine": {"type": "command", "command": "python3 ~/.claude/statusline.py"}` for the extra row, or `"env": {"CLAUDE_CODE_PLUGIN_DIRS": "~/dotfiles/claude-mods/footer-status"}` for the footer (the mod is read from the repo folder: Claude Code does not follow symlinks into a plugin, so it is not a stow package)
+- **Claude Code**: `keybindings.json` and `claude-mods/footer-status`, a mod that draws model, context, cost (usage limits on a Pro/Max subscription) and directory on the prompt footer row beside "auto mode on", shrinking to fit narrow terminals; `CLAUDE.md`, `settings.json` and skills live in a separate private repo. Turn the mod on in `~/.claude/settings.json` with `"env": {"CLAUDE_CODE_PLUGIN_DIRS": "<repo>/claude-mods/footer-status"}`, the repo's absolute path (the mod is read from the repo folder: Claude Code does not follow symlinks into a plugin, so it is not a stow package)
 - **GUI (optional)**: sway, swaync, waybar, alacritty, aerospace, sketchybar
 - **work (optional)**: a private overlay repo owns all work-specific config; see below
 
