@@ -1,7 +1,7 @@
 // footer-status: the prompt footer row as one line at any width.
 //
 //   ⏵⏵ auto mode on · 1 shell          Opus 5.5 | ctx ███░░░░░░░ 32% | $107.48 | .config
-//   ⏵⏵ auto mode on · 1 shell   Opus 5.5 | ctx ███░░░░░░░ 32% | 5h 39% · wk 5% | .config
+//   ⏵⏵ auto mode on · 1 shell   Opus 5.5 | ctx ███░░░░░░░ 32% | 3h 39% · 4d 5% | .config
 //
 // The figures (the SessionMode site, right of the row) shrink to the room the
 // row has left, so the row never wraps: see layout.ts for the order parts go
@@ -17,7 +17,7 @@ import { atom, read, update } from 'claude-code'
 import type { EngineInterface, Register, SessionRateLimit } from 'claude-code'
 
 import type { Billing, Limit, Snapshot } from '../types'
-import { columns, hintParts, layout, modeLabelColumns, PIECE_SEP, SEP } from './layout'
+import { columns, hintParts, layout, modeLabelColumns, PIECE_SEP, SEP, timeLeft } from './layout'
 import { displayName } from './names'
 
 const snapshot = atom({ plugin: 'footer-status', key: 'snapshot' } as const, null)
@@ -47,7 +47,10 @@ function limitsOf(rateLimits: readonly SessionRateLimit[]): Limit[] {
   const out: Limit[] = []
   for (const [kind, label] of WINDOWS) {
     const w = rateLimits.find(l => l.kind === kind)
-    if (w) out.push({ label, percent: w.percentUsed })
+    if (w) {
+      const resetsAt = w.resetsAt ? Date.parse(w.resetsAt) : Number.NaN
+      out.push({ label, percent: w.percentUsed, resetsAt: Number.isFinite(resetsAt) ? resetsAt : null })
+    }
   }
   return out
 }
@@ -105,6 +108,9 @@ export const register: Register = on => {
 
   on('session.start', async ($, e, next) => {
     await refresh($)
+    // The windows' time left counts down between turns: redraw once a
+    // minute. Only the footer is drawn again; nothing is measured or sent.
+    $.clock.every(60_000, () => $.ui.invalidate('ui.render'))
     // The width of the engine's mode label is reckoned from the configured
     // default mode: a mod cannot watch prompts or tool calls (the built-in
     // guard runs first and passes them on), so it never sees a shift+tab.
@@ -176,7 +182,8 @@ export const register: Register = on => {
 
     // A snapshot an older version stored has no billing: it draws the cost.
     // A first run (billing still null) draws neither until a turn is answered.
-    const windows = s.billing === 'subscription' ? (s.limits ?? []) : null
+    const now = await $.clock.now().catch(() => Date.now())
+    const windows = s.billing === 'subscription' ? (s.limits ?? []).map(w => timeLeft(w, now)) : null
     const usd = s.billing === 'subscription' || s.billing === null ? null : s.usd
     const l = layout({ model: displayName(s.model), percent: pct, usd, windows, dir: s.dir }, room)
 

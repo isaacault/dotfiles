@@ -1,6 +1,6 @@
 import { expect, test } from 'claude-code/testing'
 
-import { hintParts, layout, modeLabelColumns, usageText, width } from './layout'
+import { hintParts, layout, modeLabelColumns, timeLeft, usageText, width } from './layout'
 
 const F = { model: 'Opus 5.5', percent: 32, usd: 107.48, dir: '.config' }
 const COST = [{ text: '$107.48', percent: null }]
@@ -69,4 +69,21 @@ test('the mode label width is known per mode, widest when unknown', () => {
   expect(modeLabelColumns('default')).toBe(3)
   expect(modeLabelColumns('auto')).toBe(18)
   expect(modeLabelColumns(null)).toBe(modeLabelColumns('bypassPermissions'))
+})
+
+test('a window is labelled by the time left, rounded up', () => {
+  const now = Date.parse('2026-11-05T12:00:00Z')
+  const hours = (h: number) => now + h * 3_600_000
+  expect(timeLeft({ label: '5h', percent: 39, resetsAt: hours(4.99) }, now)).toEqual({ label: '5h', percent: 39 })
+  expect(timeLeft({ label: '5h', percent: 39, resetsAt: hours(2.5) }, now)).toEqual({ label: '3h', percent: 39 })
+  expect(timeLeft({ label: '5h', percent: 39, resetsAt: hours(0.02) }, now)).toEqual({ label: '1h', percent: 39 })
+  expect(timeLeft({ label: 'wk', percent: 5, resetsAt: hours(3.2 * 24) }, now)).toEqual({ label: '4d', percent: 5 })
+  expect(timeLeft({ label: 'wk', percent: 5, resetsAt: hours(2) }, now)).toEqual({ label: '1d', percent: 5 })
+})
+
+test('past its reset a window shows its name and no figure; with no time, its name', () => {
+  const now = Date.parse('2026-11-05T12:00:00Z')
+  expect(timeLeft({ label: '5h', percent: 39, resetsAt: now - 1 }, now)).toEqual({ label: '5h', percent: null })
+  expect(timeLeft({ label: 'wk', percent: 5, resetsAt: null }, now)).toEqual({ label: 'wk', percent: 5 })
+  expect(timeLeft({ label: 'wk', percent: 5 }, now)).toEqual({ label: 'wk', percent: 5 })
 })

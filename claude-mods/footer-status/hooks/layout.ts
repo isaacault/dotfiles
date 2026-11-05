@@ -44,6 +44,22 @@ const PLACEHOLDER: Window[] = [
   { label: 'wk', percent: null },
 ]
 
+const HOUR = 3_600_000
+const DAY = 24 * HOUR
+
+// A window labelled by the time left until it resets, rounded up: the session
+// window in hours ("3h"), the weekly one in days ("4d"). Past its reset the
+// reading is stale, so it shows the window's own label and no percentage
+// until the next response reports one; with no reset time the label stays.
+export function timeLeft(w: { label: string; percent: number | null; resetsAt?: number | null }, now: number): Window {
+  if (w.resetsAt == null || !Number.isFinite(w.resetsAt)) return { label: w.label, percent: w.percent }
+  const left = w.resetsAt - now
+  if (left <= 0) return { label: w.label, percent: null }
+  return w.label === 'wk'
+    ? { label: `${Math.ceil(left / DAY)}d`, percent: w.percent }
+    : { label: `${Math.ceil(left / HOUR)}h`, percent: w.percent }
+}
+
 export function columns(text: string): number {
   return [...text].length
 }

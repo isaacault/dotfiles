@@ -7,6 +7,9 @@ export type Billing = 'subscription' | 'cost'
 export type Limit = {
   label: string
   percent: number
+  // When the window resets, in ms since the epoch; null or absent (a snapshot
+  // an older version stored) when the response gave no time.
+  resetsAt?: number | null
 }
 
 export type Snapshot = {

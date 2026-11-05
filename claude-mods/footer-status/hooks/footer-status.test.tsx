@@ -19,9 +19,13 @@ const SUBSCRIPTION = [
   { kind: 'seven_day', percentUsed: 81 },
 ]
 
+// The engine's clock in these tests.
+const NOW = Date.parse('2026-11-05T12:00:00Z')
+
 // Stands for the engine: the session's figures, its own drawing of the site,
 // and a store holding `stored` under the billing key (writes land in `writes`).
 function engine(on: On, usage: typeof USAGE, stored?: string, writes: unknown[] = []) {
+  on('clock.now', () => ({ value: NOW }))
   on('session.model', () => ({ value: 'claude-fable-5-1' }))
   on('session.usage', () => ({ value: usage }))
   on('session.cwd', () => ({ value: '/Users/someone/.config' }))
@@ -127,5 +131,22 @@ test('the hint line drops "to manage" and keeps the shell count', async ($, on) 
   })
   expect((await ui.find({ type: 'Text', text: /shells/ }))?.text).toBe('2 shells')
   expect(await ui.find({ type: 'Text', text: /manage/ })).toBeUndefined()
+  await ui.unmount()
+})
+
+test('the windows count down to their resets', async ($, on) => {
+  const now = NOW
+  engine(on, {
+    ...USAGE,
+    rateLimits: [
+      { kind: 'five_hour', percentUsed: 39, resetsAt: new Date(now + 2.2 * 3_600_000).toISOString() },
+      { kind: 'seven_day', percentUsed: 5, resetsAt: new Date(now + 3.5 * 86_400_000).toISOString() },
+    ],
+  }, 'subscription')
+  await $.session.start({ cwd: '/', surface: 'terminal', isInteractive: true })
+
+  const ui = await $.ui.mount({ ...SITE, surface: 'terminal' })
+  expect((await ui.find({ type: 'Text', text: /39%/ }))?.text).toBe('3h 39%')
+  expect((await ui.find({ type: 'Text', text: /^4d/ }))?.text).toBe('4d 5%')
   await ui.unmount()
 })

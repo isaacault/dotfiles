@@ -14,8 +14,14 @@ event.
 The usage figure follows how the account is billed. An account that pays per
 use (an enterprise budget, an API key, a gateway) shows the session cost,
 `$107.48`. A Pro or Max subscription, where that figure is only an estimate,
-shows the five-hour session window and the weekly window instead,
-`5h 39% · wk 5%`, each coloured on its own. The account is told apart by the
+shows the five-hour session window and the weekly window instead, each
+labelled by the time left until it resets, rounded up: `3h 39% · 4d 5%` is the
+session window 39% used with under three hours to go, and the week 5% used
+with under four days. The labels count down between turns (the footer is
+redrawn once a minute; nothing is measured or sent for it). Past a reset the
+window shows its own name and no figure, `5h --`, until the next reply
+reports one; with no reset time it shows `5h` or `wk`. Each is coloured on its
+own. The account is told apart by the
 rate-limit windows the API reports; the verdict is kept in the mod's store, so
 a new session draws `5h -- · wk --` (or the cost) before its first reply, and
 on a machine's very first session that slot stays empty until a turn is
