@@ -1,7 +1,7 @@
 {
   "name": "footer-status",
-  "version": "0.2.0",
-  "description": "Model, context fill, cost and directory on the prompt footer row, beside the mode labels",
+  "version": "0.3.0",
+  "description": "Model, context fill, cost or usage limits, and directory on the prompt footer row, beside the mode labels",
   "types": "./types/index.d.ts",
   "license": "MIT",
   "author": {
