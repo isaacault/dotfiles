@@ -74,10 +74,16 @@ else
   mkdir -p "$HOME/.local/bin" "$HOME/.local/opt"
 
   # neovim: distro repos lag badly; use the official release tarball
-  if ! command -v nvim >/dev/null 2>&1 && [ ! -d "$HOME/.local/opt/nvim-linux-x86_64" ]; then
-    curl -fsSL https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz \
-      | tar xz -C "$HOME/.local/opt"
-    ln -sf "$HOME/.local/opt/nvim-linux-x86_64/bin/nvim" "$HOME/.local/bin/nvim"
+  # (published for x86_64 and arm64, e.g. a Jetson or a Raspberry Pi)
+  case "$(uname -m)" in
+    x86_64|amd64) nvim_arch=x86_64 ;;
+    aarch64|arm64) nvim_arch=arm64 ;;
+    *) nvim_arch="" ; echo "nvim: no release tarball for $(uname -m); install it yourself" >&2 ;;
+  esac
+  if [ -n "$nvim_arch" ] && ! command -v nvim >/dev/null 2>&1 && [ ! -d "$HOME/.local/opt/nvim-linux-$nvim_arch" ]; then
+    fetch "https://github.com/neovim/neovim/releases/latest/download/nvim-linux-$nvim_arch.tar.gz" "$tmp/nvim.tar.gz"
+    tar xzf "$tmp/nvim.tar.gz" -C "$HOME/.local/opt"
+    ln -sf "$HOME/.local/opt/nvim-linux-$nvim_arch/bin/nvim" "$HOME/.local/bin/nvim"
   fi
 
   # starship prompt
