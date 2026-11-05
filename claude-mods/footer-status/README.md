@@ -15,8 +15,10 @@ The row never wraps. As the terminal narrows the figures drop, in order: the
 model, the "ctx" label, the bar, the directory, the cost, and last the
 percentage. The hint on the left loses "↓ to manage". The permission-mode label
 ("auto mode on") is drawn by Claude Code itself and no mod can hide it, so its
-width is counted instead, read from the permission mode of the last prompt or
-tool call.
+width is counted instead, from the default mode in settings
+(`permissions.defaultMode`) plus a few columns of margin. A mod cannot watch
+prompts or tool calls, so a shift+tab to a much longer label, such as bypass
+permissions, can wrap the row until the next session.
 
 Claude Code hands a mod the model ID (`claude-opus-5-5`), so the footer turns
 it into the name the `/model` picker shows (`Opus 5.5`); a `[1m]` ID gets

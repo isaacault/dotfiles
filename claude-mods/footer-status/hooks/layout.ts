@@ -53,7 +53,9 @@ export function layout(f: Figures, room: number): Layout {
 
 // Width of the permission-mode label the engine draws at the start of the
 // row ("⏵⏵ auto mode on"). Mods cannot redraw or hide it, so the row's room
-// is reckoned around it; an unknown mode reserves the widest label.
+// is reckoned around it, from the configured default mode plus MODE_MARGIN
+// for a shift+tab to a slightly longer label; an unknown mode reserves the
+// widest.
 const MODE_LABEL: Record<string, number> = {
   default: 0,
   auto: columns('⏵⏵ auto mode on'),
@@ -63,8 +65,11 @@ const MODE_LABEL: Record<string, number> = {
 }
 const WIDEST_LABEL = Math.max(...Object.values(MODE_LABEL))
 
+const MODE_MARGIN = 3
+
 export function modeLabelColumns(mode: string | null): number {
-  return mode === null ? WIDEST_LABEL : (MODE_LABEL[mode] ?? WIDEST_LABEL)
+  if (mode === null || MODE_LABEL[mode] === undefined) return WIDEST_LABEL
+  return Math.min(WIDEST_LABEL, MODE_LABEL[mode] + MODE_MARGIN)
 }
 
 // The hint line minus the parts not wanted ("↓ to manage").

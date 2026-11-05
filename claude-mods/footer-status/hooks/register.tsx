@@ -53,6 +53,16 @@ export const register: Register = on => {
 
   on('session.start', async ($, e, next) => {
     await refresh($)
+    // The width of the engine's mode label is reckoned from the configured
+    // default mode: a mod cannot watch prompts or tool calls (the built-in
+    // guard runs first and passes them on), so it never sees a shift+tab.
+    try {
+      const configured = await $.settings.read({ key: 'permissions' })
+      const dm = (configured as { defaultMode?: unknown } | undefined)?.defaultMode
+      if (typeof dm === 'string') await update($, mode, () => dm)
+    } catch {
+      // unknown: the widest label is reserved
+    }
     return next(e)
   })
 
@@ -61,17 +71,6 @@ export const register: Register = on => {
     await refresh($)
     return next(e)
   })
-
-  // The permission mode, for the width of the engine's label. These only
-  // watch: on any failure the prompt or tool call goes on untouched.
-  on('classic.UserPromptSubmit', async ($, e, next) => {
-    if (e.permission_mode) await update($, mode, () => e.permission_mode ?? null)
-    return next(e)
-  }).catch(($, e, next) => next(e))
-  on('classic.PostToolUse', async ($, e, next) => {
-    if (e.permission_mode) await update($, mode, () => e.permission_mode ?? null)
-    return next(e)
-  }).catch(($, e, next) => next(e))
 
   on('ui.render', { component: 'PromptHint' }, async ($, e, next) => {
     const { kept, changed } = hintParts(e.props.hint)

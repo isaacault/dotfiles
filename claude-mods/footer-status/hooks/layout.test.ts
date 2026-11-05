@@ -35,7 +35,7 @@ test('the hint loses "to manage" and keeps the rest', () => {
 })
 
 test('the mode label width is known per mode, widest when unknown', () => {
-  expect(modeLabelColumns('default')).toBe(0)
-  expect(modeLabelColumns('auto')).toBe(15)
+  expect(modeLabelColumns('default')).toBe(3)
+  expect(modeLabelColumns('auto')).toBe(18)
   expect(modeLabelColumns(null)).toBe(modeLabelColumns('bypassPermissions'))
 })
